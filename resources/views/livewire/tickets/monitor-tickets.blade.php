@@ -34,6 +34,7 @@ new class extends Component {
 
         if ($status === 'On Progress') {
             $data['technician_id'] = Auth::id();
+            $data['taken_at'] = now();
         }
 
         $ticket->update($data);
@@ -64,6 +65,7 @@ new class extends Component {
             'keterangan_it' => $this->keterangan_it,
             'kategori_perubahan' => $this->kategori_perubahan,
             'kategori_alat' => $this->kategori_alat,
+            'closed_at' => now(),
         ]);
 
         $this->modal('closing-modal')->close();
@@ -203,7 +205,32 @@ new class extends Component {
             </div>
             <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">CLOSED</span>
         </div>
+        <div class="space-y-2 border-l-2 border-indigo-500 pl-4 ml-2">
+            <div class="text-xs">
+                <span class="text-gray-400">Diajukan:</span>
+                <span class="font-medium text-gray-700">{{ $detailTicket->created_at->format('d M Y, H:i') }}</span>
+            </div>
 
+            @if($detailTicket->taken_at)
+            <div class="text-xs">
+                <span class="text-gray-400">Mulai Dikerjakan:</span>
+                <span class="font-medium text-gray-700">{{ \Carbon\Carbon::parse($detailTicket->taken_at)->format('d M Y, H:i') }}</span>
+                <span class="text-indigo-500 ml-2">
+                    ({{ round($detailTicket->created_at->diffInMinutes($detailTicket->taken_at, false), 1) }} menit respon)
+                </span>
+            </div>
+            @endif
+
+            @if($detailTicket->closed_at)
+            <div class="text-xs">
+                <span class="text-gray-400">Selesai:</span>
+                <span class="font-medium text-gray-700">{{ \Carbon\Carbon::parse($detailTicket->closed_at)->format('d M Y, H:i') }}</span>
+                <span class="text-green-600 ml-2">
+                    ({{ round($detailTicket->taken_at->diffInMinutes($detailTicket->closed_at, false), 1) }} menit pengerjaan)
+                </span>
+            </div>
+            @endif
+        </div>
         <div class="grid grid-cols-2 gap-6 bg-slate-50 p-5 rounded-xl border border-slate-100">
             <div>
                 <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Kategori Alat</p>
@@ -222,7 +249,7 @@ new class extends Component {
                     {{ $detailTicket->tindak_lanjut ?? 'Data tindak lanjut tidak ditemukan.' }}
                 </div>
             </div>
-             <div>
+            <div>
                 <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mb-1">Hasil Keterangan Tambahan</p>
                 <div class="bg-white p-4 rounded-lg border border-gray-200 text-sm text-gray-700 leading-relaxed shadow-sm">
                     {{ $detailTicket->keterangan_it ?? 'Data keterangan tambahan tidak ditemukan.' }}

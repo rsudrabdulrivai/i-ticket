@@ -19,6 +19,13 @@ class Ticket extends Model
         'keterangan_it',
         'kategori_perubahan',
         'kategori_alat',
+        'taken_at',
+        'closed_at' // <--- TAMBAHKAN DUA INI
+    ];
+
+    protected $casts = [
+        'taken_at' => 'datetime',
+        'closed_at' => 'datetime',
     ];
     public function user()
     {

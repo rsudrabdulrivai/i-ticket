@@ -22,6 +22,8 @@ return new class extends Migration
             $table->enum('status', ['Open', 'On Progress', 'Pending', 'Closed'])->default('Open');
             $table->text('solution')->nullable(); // Catatan perbaikan jika sudah selesai
             $table->timestamps();
+            $table->timestamp('taken_at')->nullable();  
+            $table->timestamp('closed_at')->nullable();
         });
     }
 
