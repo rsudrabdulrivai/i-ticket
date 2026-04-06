@@ -15,6 +15,18 @@ class Ticket extends Model
         'priority',
         'status',
         'technician_id',
-        'solution'
+        'tindak_lanjut',
+        'keterangan_it',
+        'kategori_perubahan',
+        'kategori_alat',
     ];
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function technician()
+    {
+        return $this->belongsTo(User::class, 'technician_id');
+    }
 }

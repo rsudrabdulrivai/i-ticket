@@ -20,7 +20,6 @@ return new class extends Migration
             $table->enum('category', ['Hardware', 'Software', 'Network', 'Sistem RS'])->default('Hardware');
             $table->enum('priority', ['Low', 'Medium', 'High', 'Urgent'])->default('Medium');
             $table->enum('status', ['Open', 'On Progress', 'Pending', 'Closed'])->default('Open');
-            $table->foreignId('technician_id')->nullable()->constrained('users'); // Teknisi yang menangani
             $table->text('solution')->nullable(); // Catatan perbaikan jika sudah selesai
             $table->timestamps();
         });
