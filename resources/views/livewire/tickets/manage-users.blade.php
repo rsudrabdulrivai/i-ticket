@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 new class extends Component {
+    public $search = '';
     public $name = '';
     public $email = '';
     public $password = '';
@@ -15,7 +16,10 @@ new class extends Component {
     public function with(): array
     {
         return [
-            'users' => User::latest()->get(),
+            'users' => User::where('name', 'like', '%' . $this->search . '%')
+                ->orWhere('email', 'like', '%' . $this->search . '%')
+                ->latest()
+                ->get(),
         ];
     }
 
@@ -33,7 +37,7 @@ new class extends Component {
         $this->email = $user->email;
         $this->is_it_staff = (bool) $user->is_it_staff;
         $this->password = ''; // Kosongkan password saat edit
-        
+
         $this->modal('user-modal')->show();
     }
 
@@ -95,13 +99,22 @@ new class extends Component {
     </div>
     @endif
 
-    <div class="flex justify-between items-center px-1">
-        <div>
-            <h2 class="text-xl font-bold text-gray-900">Manajemen Pengguna</h2>
-            <p class="text-sm text-gray-500">Kelola staf IT dan user unit rumah sakit.</p>
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4 px-1">
+        <div class="w-full md:w-72">
+            <flux:input
+                wire:model.live.debounce.300ms="search"
+                icon="magnifying-glass"
+                placeholder="Cari nama atau email..."
+                clearable />
         </div>
 
-        <flux:button wire:click="openAddModal" variant="primary" size="sm" icon="user-plus">Tambah User</flux:button>
+        <flux:button
+            wire:click="openAddModal"
+            variant="primary"
+            icon="user-plus"
+            class="w-full md:w-auto">
+            Tambah User
+        </flux:button>
     </div>
 
     <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
@@ -178,13 +191,13 @@ new class extends Component {
         <form wire:submit="saveUser" class="space-y-4">
             <flux:input wire:model="name" label="Nama Lengkap" placeholder="Masukkan nama..." required />
             <flux:input wire:model="email" type="email" label="Email" placeholder="email@rs.com" required />
-            
-            <flux:input 
-                wire:model="password" 
-                type="password" 
-                label="Password" 
-                placeholder="{{ $editingUserId ? 'Kosongkan jika tidak ingin diubah' : 'Minimal 6 karakter' }}" 
-                viewable 
+
+            <flux:input
+                wire:model="password"
+                type="password"
+                label="Password"
+                placeholder="{{ $editingUserId ? 'Kosongkan jika tidak ingin diubah' : 'Minimal 6 karakter' }}"
+                viewable
                 :required="!$editingUserId" />
 
             <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">

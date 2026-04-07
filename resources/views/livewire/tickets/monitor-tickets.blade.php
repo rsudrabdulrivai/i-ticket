@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 
 new class extends Component {
+    public $search = '';
+    public $statusFilter = '';
     public $selectedTicketId;
     public $tindak_lanjut = '';
     public $keterangan_it = '';
@@ -20,10 +22,27 @@ new class extends Component {
 
     public function with(): array
     {
+        $query = Ticket::with(['user', 'technician']);
+
+        // Filter Pencarian (ID, Subject, Nama User, Lokasi)
+        if ($this->search) {
+            $query->where(function ($q) {
+                $q->where('id', 'like', '%' . $this->search . '%')
+                    ->orWhere('subject', 'like', '%' . $this->search . '%')
+                    ->orWhere('location', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('user', function ($u) {
+                        $u->where('name', 'like', '%' . $this->search . '%');
+                    });
+            });
+        }
+
+        // Filter Status (Tab)
+        if ($this->statusFilter) {
+            $query->where('status', $this->statusFilter);
+        }
+
         return [
-            'all_tickets' => Ticket::with(['user', 'technician'])
-                ->latest()
-                ->get(),
+            'all_tickets' => $query->latest()->get(),
         ];
     }
 
@@ -93,6 +112,30 @@ new class extends Component {
         {{ session('monitor_msg') }}
     </div>
     @endif
+    <div class="flex flex-col lg:flex-row justify-between items-center gap-4 px-1">
+        <div class="w-full lg:w-96">
+            <flux:input
+                wire:model.live.debounce.300ms="search"
+                icon="magnifying-glass"
+                placeholder="Cari ID, Judul, Pelapor, atau Lokasi..."
+                clearable />
+        </div>
+
+        <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200">
+            <button wire:click="$set('statusFilter', '')" class="px-4 py-1.5 rounded-md text-xs font-bold transition {{ $statusFilter === '' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700' }}">
+                Semua
+            </button>
+            <button wire:click="$set('statusFilter', 'Open')" class="px-4 py-1.5 rounded-md text-xs font-bold transition {{ $statusFilter === 'Open' ? 'bg-white shadow-sm text-red-600' : 'text-gray-500 hover:text-gray-700' }}">
+                Open
+            </button>
+            <button wire:click="$set('statusFilter', 'On Progress')" class="px-4 py-1.5 rounded-md text-xs font-bold transition {{ $statusFilter === 'On Progress' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700' }}">
+                Proses
+            </button>
+            <button wire:click="$set('statusFilter', 'Closed')" class="px-4 py-1.5 rounded-md text-xs font-bold transition {{ $statusFilter === 'Closed' ? 'bg-white shadow-sm text-green-600' : 'text-gray-500 hover:text-gray-700' }}">
+                Selesai
+            </button>
+        </div>
+    </div>
 
     <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
         <table class="w-full text-sm text-left text-gray-500">
