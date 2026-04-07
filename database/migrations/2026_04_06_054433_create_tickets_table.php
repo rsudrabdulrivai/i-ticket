@@ -13,23 +13,20 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Siapa yang lapor
-            $table->string('subject'); // Judul kendala (misal: Printer Macet)
-            $table->text('description'); // Detail masalah
-            $table->string('location'); // Ruangan (IGD, ICU, Poli, dll)
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); 
+            $table->string('subject'); 
+            $table->text('description'); 
+            $table->string('location')->nullable(); 
             $table->enum('category', ['Hardware', 'Software', 'Network', 'Sistem RS'])->default('Hardware');
             $table->enum('priority', ['Low', 'Medium', 'High', 'Urgent'])->default('Medium');
             $table->enum('status', ['Open', 'On Progress', 'Pending', 'Closed'])->default('Open');
-            $table->text('solution')->nullable(); // Catatan perbaikan jika sudah selesai
+            $table->text('solution')->nullable();
             $table->timestamps();
             $table->timestamp('taken_at')->nullable();  
             $table->timestamp('closed_at')->nullable();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('tickets');

@@ -10,6 +10,13 @@ new class extends Component {
     public $location = '';
     public $category = 'Hardware';
     public $priority = 'Medium';
+    public $listRuangan = [
+        'Rawat Jalan' => ['Poli Anak', 'Poli Dalam', 'Poli Gigi', 'Poli Mata', 'Poli THT', 'Poli Umum'],
+        'Rawat Inap'  => ['Bangsal Melati', 'Bangsal Mawar', 'Bangsal Dahlia', 'ICU', 'NICU/PICU'],
+        'IGD'         => ['Ruang Triase', 'Ruang Resusitasi', 'Poned'],
+        'Manajemen'   => ['Direksi', 'SDM/Kepegawaian', 'Keuangan', 'Rekam Medis', 'Tata Usaha'],
+        'Penunjang'   => ['Laboratorium', 'Radiologi', 'Farmasi/Apotek', 'Gizi', 'Gudang Logistik', 'Kamar Jenazah']
+    ];
 
     // Mengambil data tiket terbaru milik user yang login
     public function with(): array
@@ -64,21 +71,24 @@ new class extends Component {
                     @error('subject') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Lokasi / Nama Ruangan</label>
-                    <input type="text" wire:model="location" placeholder="Contoh: IGD, Poli Gigi, Farmasi" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-900">
-                    @error('location') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                </div>
+                <flux:select wire:model="location" label="Lokasi / Ruangan" placeholder="Pilih Ruangan..." searchable>
+                    <option value="">-- Pilih Lokasi --</option>
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Kategori Kendala</label>
-                    <select wire:model="category" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-gray-900">
-                        <option value="Hardware">Hardware (Komputer/Printer)</option>
-                        <option value="Software">Software (Windows/Office)</option>
-                        <option value="Network">Network (Internet/LAN)</option>
-                        <option value="Sistem RS">Sistem RS (SIMRS/Aplikasi)</option>
-                    </select>
-                </div>
+                    @foreach($listRuangan as $kategori => $ruangans)
+                    <optgroup label="--- {{ strtoupper($kategori) }} ---">
+                        @foreach($ruangans as $ruang)
+                        <option value="{{ $ruang }}">{{ $ruang }}</option>
+                        @endforeach
+                    </optgroup>
+                    @endforeach
+                </flux:select>
+
+                <flux:select wire:model="category" label="Kategori Kendala" placeholder="Pilih Kategori...">
+                    <flux:select.option value="Hardware">Hardware (Komputer/Printer)</flux:select.option>
+                    <flux:select.option value="Software">Software (Windows/Office)</flux:select.option>
+                    <flux:select.option value="Network">Network (Internet/LAN)</flux:select.option>
+                    <flux:select.option value="Sistem RS">Sistem RS (SIMRS/Aplikasi)</flux:select.option>
+                </flux:select>
             </div>
 
             <div class="mb-6">
