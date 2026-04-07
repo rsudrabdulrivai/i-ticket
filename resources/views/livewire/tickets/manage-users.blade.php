@@ -4,15 +4,14 @@ use Livewire\Volt\Component;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
 
 new class extends Component {
     public $name = '';
     public $email = '';
     public $password = '';
     public $is_it_staff = false;
+    public $editingUserId = null;
 
-    // Data yang dilempar ke View
     public function with(): array
     {
         return [
@@ -20,36 +19,64 @@ new class extends Component {
         ];
     }
 
-    // Logika Simpan User
+    public function openAddModal()
+    {
+        $this->reset(['name', 'email', 'password', 'is_it_staff', 'editingUserId']);
+        $this->modal('user-modal')->show();
+    }
+
+    public function editUser($id)
+    {
+        $user = User::find($id);
+        $this->editingUserId = $user->id;
+        $this->name = $user->name;
+        $this->email = $user->email;
+        $this->is_it_staff = (bool) $user->is_it_staff;
+        $this->password = ''; // Kosongkan password saat edit
+        
+        $this->modal('user-modal')->show();
+    }
+
     public function saveUser()
     {
         $this->validate([
             'name' => 'required',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
+            'email' => 'required|email|unique:users,email,' . ($this->editingUserId ?? 'NULL'),
+            'password' => $this->editingUserId ? 'nullable|min:6' : 'required|min:6',
         ]);
 
-        User::create([
-            'name' => $this->name,
-            'email' => $this->email,
-            'password' => Hash::make($this->password),
-            'is_it_staff' => $this->is_it_staff, // Simpan status staff
-        ]);
+        if ($this->editingUserId) {
+            $user = User::find($this->editingUserId);
+            $data = [
+                'name' => $this->name,
+                'email' => $this->email,
+                'is_it_staff' => $this->is_it_staff,
+            ];
+            if ($this->password) {
+                $data['password'] = Hash::make($this->password);
+            }
+            $user->update($data);
+            $message = 'User berhasil diperbarui.';
+        } else {
+            User::create([
+                'name' => $this->name,
+                'email' => $this->email,
+                'password' => Hash::make($this->password),
+                'is_it_staff' => $this->is_it_staff,
+            ]);
+            $message = 'User berhasil ditambahkan.';
+        }
 
-        $this->reset(['name', 'email', 'password', 'is_it_staff']);
-        $this->modal('add-user-modal')->close();
-        session()->flash('message', 'User berhasil ditambahkan.');
+        $this->modal('user-modal')->close();
+        session()->flash('message', $message);
     }
 
-    // Logika Hapus User
     public function deleteUser($id)
     {
-        // Proteksi agar tidak menghapus diri sendiri
         if ($id === Auth::id()) {
             session()->flash('error', 'Gak bisa hapus akun sendiri, Ri!');
             return;
         }
-
         User::find($id)->delete();
         session()->flash('message', 'User telah dihapus.');
     }
@@ -74,9 +101,7 @@ new class extends Component {
             <p class="text-sm text-gray-500">Kelola staf IT dan user unit rumah sakit.</p>
         </div>
 
-        <flux:modal.trigger name="add-user-modal">
-            <flux:button variant="primary" size="sm" icon="user-plus">Tambah User</flux:button>
-        </flux:modal.trigger>
+        <flux:button wire:click="openAddModal" variant="primary" size="sm" icon="user-plus">Tambah User</flux:button>
     </div>
 
     <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
@@ -86,7 +111,6 @@ new class extends Component {
                     <th class="px-6 py-4">Nama User</th>
                     <th class="px-6 py-4">Email</th>
                     <th class="px-6 py-4">Status / Role</th>
-                    <th class="px-6 py-4">Bergabung</th>
                     <th class="px-6 py-4 text-center">Aksi</th>
                 </tr>
             </thead>
@@ -106,16 +130,20 @@ new class extends Component {
                     </td>
                     <td class="px-6 py-4">
                         @if($user->is_it_staff)
-                            <span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-[10px] font-bold border border-indigo-200 uppercase">IT Staff</span>
+                        <span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-[10px] font-bold border border-indigo-200 uppercase">IT Staff</span>
                         @else
-                            <span class="px-2 py-1 bg-gray-100 text-gray-500 rounded text-[10px] font-bold border border-gray-200 uppercase">User Unit</span>
+                        <span class="px-2 py-1 bg-gray-100 text-gray-500 rounded text-[10px] font-bold border border-gray-200 uppercase">User Unit</span>
                         @endif
-                    </td>
-                    <td class="px-6 py-4">
-                        <div class="text-gray-500">{{ $user->created_at->translatedFormat('d M Y') }}</div>
                     </td>
                     <td class="px-6 py-4 text-center">
                         <div class="flex justify-center gap-2">
+                            <flux:button
+                                wire:click="editUser({{ $user->id }})"
+                                variant="ghost"
+                                size="sm"
+                                icon="pencil-square"
+                                class="text-blue-600" />
+
                             @if($user->id !== Auth::id())
                             <flux:button
                                 wire:click="deleteUser({{ $user->id }})"
@@ -125,14 +153,14 @@ new class extends Component {
                                 icon="trash"
                                 class="text-red-600 hover:text-red-700" />
                             @else
-                            <span class="px-2 py-1 bg-gray-100 text-gray-500 rounded text-[10px] font-bold border border-gray-200">ANDA</span>
+                            <span class="px-2 py-1 bg-gray-100 text-gray-500 rounded text-[10px] font-bold border border-gray-200 uppercase flex items-center justify-center">Anda</span>
                             @endif
                         </div>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="px-6 py-20 text-center text-gray-400 italic text-lg">
+                    <td colspan="4" class="px-6 py-20 text-center text-gray-400 italic text-lg">
                         Belum ada user yang terdaftar.
                     </td>
                 </tr>
@@ -141,30 +169,38 @@ new class extends Component {
         </table>
     </div>
 
-    <flux:modal name="add-user-modal" class="md:w-[450px] space-y-6">
+    <flux:modal name="user-modal" class="md:w-[450px] space-y-6">
         <div>
-            <flux:heading size="lg">Tambah User Baru</flux:heading>
-            <flux:subheading>Input kredensial dan tentukan hak akses user.</flux:subheading>
+            <flux:heading size="lg">{{ $editingUserId ? 'Edit User' : 'Tambah User Baru' }}</flux:heading>
+            <flux:subheading>{{ $editingUserId ? 'Perbarui informasi user atau hak aksesnya.' : 'Input kredensial dan tentukan hak akses user.' }}</flux:subheading>
         </div>
 
         <form wire:submit="saveUser" class="space-y-4">
             <flux:input wire:model="name" label="Nama Lengkap" placeholder="Masukkan nama..." required />
             <flux:input wire:model="email" type="email" label="Email" placeholder="email@rs.com" required />
-            <flux:input wire:model="password" type="password" label="Password" viewable required />
             
-            <div class="pt-2 pb-4">
-                <flux:checkbox 
-                    wire:model="is_it_staff" 
-                    label="Berikan Akses Staf IT" 
-                    description="Centang jika user ini adalah tim IT yang akan mengelola tiket." 
-                />
+            <flux:input 
+                wire:model="password" 
+                type="password" 
+                label="Password" 
+                placeholder="{{ $editingUserId ? 'Kosongkan jika tidak ingin diubah' : 'Minimal 6 karakter' }}" 
+                viewable 
+                :required="!$editingUserId" />
+
+            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                <flux:checkbox
+                    wire:model="is_it_staff"
+                    label="Berikan Akses Staf IT"
+                    description="User ini akan bisa melihat dashboard monitor tiket dan melakukan pengerjaan IT." />
             </div>
 
             <div class="flex gap-2 justify-end pt-4">
                 <flux:modal.close>
                     <flux:button variant="ghost">Batal</flux:button>
                 </flux:modal.close>
-                <flux:button type="submit" variant="primary">Simpan User</flux:button>
+                <flux:button type="submit" variant="primary">
+                    {{ $editingUserId ? 'Simpan Perubahan' : 'Simpan User' }}
+                </flux:button>
             </div>
         </form>
     </flux:modal>
