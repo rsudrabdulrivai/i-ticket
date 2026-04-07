@@ -30,7 +30,7 @@ new class extends Component {
     public function mount()
     {
         $this->updateStats();
-        $this->listRuangan = config('hospital.rooms');
+        $this->listRuangan = config('options.rooms');
     }
 
     public function updateStats()

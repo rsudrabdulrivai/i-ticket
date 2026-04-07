@@ -15,7 +15,7 @@ new class extends Component {
     // Di dalam class Volt
     public function mount()
     {
-        $this->listRuangan = config('hospital.rooms');
+        $this->listRuangan = config('options.rooms');
     }
 
     public function getAvailableRuanganProperty()
@@ -73,6 +73,13 @@ new class extends Component {
                     icon="pencil-square"
                     class="md:col-span-2" />
 
+                <flux:select wire:model="category" label="Kategori Kendala" placeholder="Pilih Kategori...">
+                    <flux:select.option value="Hardware">Hardware (Komputer/Printer)</flux:select.option>
+                    <flux:select.option value="Software">Software (Windows/Office)</flux:select.option>
+                    <flux:select.option value="Network">Network (Internet/LAN)</flux:select.option>
+                    <flux:select.option value="Sistem RS">Sistem RS (SIMRS/Aplikasi)</flux:select.option>
+                </flux:select>
+
                 <flux:select wire:model.live="selectedKategoriLokasi" label="Bidang" placeholder="Pilih Bidang...">
                     <option value="">-- Pilih Kelompok --</option>
                     @foreach(array_keys($listRuangan) as $kat)
@@ -91,13 +98,6 @@ new class extends Component {
                     @endforeach
                 </flux:select>
 
-                <flux:select wire:model="category" label="Kategori Kendala" placeholder="Pilih Kategori...">
-                    <flux:select.option value="Hardware">Hardware (Komputer/Printer)</flux:select.option>
-                    <flux:select.option value="Software">Software (Windows/Office)</flux:select.option>
-                    <flux:select.option value="Network">Network (Internet/LAN)</flux:select.option>
-                    <flux:select.option value="Sistem RS">Sistem RS (SIMRS/Aplikasi)</flux:select.option>
-                </flux:select>
-
                 <flux:textarea
                     wire:model="description"
                     label="Detail Masalah"
@@ -112,51 +112,78 @@ new class extends Component {
         </form>
     </div>
 
-    <div class="p-6 bg-white rounded-lg border border-gray-200 shadow-sm">
+    <div class="p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
         <h3 class="text-lg font-bold text-gray-800 mb-4">Riwayat Laporan Saya</h3>
         <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left text-gray-500">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+            <table class="w-full text-sm text-left">
+                <thead class="bg-gray-50 border-b text-[10px] uppercase font-black text-gray-400 tracking-widest">
                     <tr>
-                        <th class="px-4 py-3">Tanggal</th>
-                        <th class="px-4 py-3">Judul</th>
-                        <th class="px-4 py-3">Lokasi</th>
-                        <th class="px-4 py-3">Status</th>
-                        <th class="px-4 py-3">Teknisi</th>
+                        <th class="px-6 py-4">Tanggal</th>
+                        <th class="px-6 py-4">Judul Kendala</th>
+                        <th class="px-6 py-4 text-center">Status</th>
+                        <th class="px-6 py-4">Lokasi</th>
+                        <th class="px-6 py-4">Teknisi IT</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse($my_tickets as $ticket)
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-4 py-3 whitespace-nowrap text-gray-600">
+                    <tr class="hover:bg-slate-50 transition group">
+                        <td class="px-6 py-4 whitespace-nowrap text-gray-500 font-medium">
                             {{ $ticket->created_at->format('d M Y, H:i') }}
                         </td>
-                        <td class="px-4 py-3 font-medium text-gray-900">
-                            {{ $ticket->subject }}
+                        <td class="px-6 py-4">
+                            <div class="font-bold text-gray-900">{{ $ticket->subject }}</div>
+                            <div class="text-[10px] text-gray-400 uppercase tracking-tight">{{ $ticket->category }}</div>
                         </td>
-                        <td class="px-4 py-3 text-gray-600">
-                            {{ $ticket->location }}
+
+                        <td class="px-6 py-4">
+                            <div class="flex justify-center"> @php
+                                $badgeColor = match($ticket->status) {
+                                'Open' => 'red',
+                                'On Progress' => 'blue',
+                                'Closed' => 'green',
+                                default => 'slate'
+                                };
+
+                                $statusLabel = match($ticket->status) {
+                                'Open' => 'Terbuka',
+                                'On Progress' => 'Dikerjakan',
+                                'Closed' => 'Selesai',
+                                default => $ticket->status
+                                };
+                                @endphp
+                                <flux:badge color="{{ $badgeColor }}" size="sm" class="font-black uppercase text-[9px] tracking-widest whitespace-nowrap">
+                                    {{ $statusLabel }}
+                                </flux:badge>
+                            </div>
                         </td>
-                        <td class="px-4 py-3">
-                            @if($ticket->status == 'Open')
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700">Terbuka</span>
-                            @elseif($ticket->status == 'On Progress')
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700">Dikerjakan</span>
-                            @else
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700">Selesai</span>
-                            @endif
+
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <flux:icon.map-pin size="sm" class="text-gray-300" />
+                                <span class="text-xs font-semibold text-gray-600">{{ $ticket->location }}</span>
+                            </div>
                         </td>
-                        <td class="px-4 py-3 text-gray-600">
+
+                        <td class="px-6 py-4">
                             @if($ticket->technician)
-                            <span class="text-indigo-600 font-medium">👨‍🔧 {{ $ticket->technician->name }}</span>
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-full bg-indigo-50 flex items-center justify-center border border-indigo-100">
+                                    <flux:icon.user size="xs" class="text-indigo-500" />
+                                </div>
+                                <span class="text-xs font-bold text-indigo-600">{{ $ticket->technician->name }}</span>
+                            </div>
                             @else
-                            <span class="text-gray-400">-</span>
+                            <div class="flex items-center gap-2 text-gray-400 italic">
+                                <flux:icon.clock size="sm" />
+                                <span class="text-[11px]">Menunggu Teknisi...</span>
+                            </div>
                             @endif
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="px-4 py-10 text-center text-gray-400 italic">
+                        <td colspan="5" class="p-16 text-center italic text-gray-400 bg-gray-50/50">
                             Belum ada riwayat laporan kendala.
                         </td>
                     </tr>
