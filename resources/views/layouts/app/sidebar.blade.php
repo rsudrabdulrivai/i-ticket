@@ -26,6 +26,9 @@
                 <flux:sidebar.item icon="user-group" :href="route('it-staff')" :current="request()->routeIs('it-staff')" wire:navigate>
                     {{ __('Manage IT Staff') }}
                 </flux:sidebar.item>
+                <flux:sidebar.item icon="server-stack" :href="route('inventory')" :current="request()->routeIs('inventory')" wire:navigate>
+                    {{ __('Inventaris') }}
+                </flux:sidebar.item>
                 @endif
             </flux:sidebar.group>
         </flux:sidebar.nav>

@@ -18,6 +18,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('/it-staff', 'it-staff')
         ->middleware('can:access-it-staff')
         ->name('it-staff');
+
+    Route::view('/inventory', 'inventory')
+        ->middleware('can:access-inventory')
+        ->name('inventory');
 });
 
 require __DIR__ . '/settings.php';

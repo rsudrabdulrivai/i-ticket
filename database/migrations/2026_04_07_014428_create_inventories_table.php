@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('inventories', function (Blueprint $table) {
             $table->id();
+            $table->string('asset_code')->unique(); // Contoh: INV-IT-2024-001
+            $table->string('name');
+            $table->string('brand');
+            $table->string('category'); // PC, Laptop, Printer, Router, dll
+            $table->text('specification');
+            $table->string('room'); // Lokasi: IGD, Poli Dalam, IT Room, dll
+            $table->enum('status', ['ready', 'used', 'repair', 'broken'])->default('ready');
+            $table->date('purchase_date')->nullable();
             $table->timestamps();
         });
     }
