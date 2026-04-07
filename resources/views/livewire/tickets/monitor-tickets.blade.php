@@ -57,6 +57,18 @@ new class extends Component {
 
     public function saveClosing()
     {
+        // Tambahkan Validasi di sini
+        $this->validate([
+            'kategori_alat' => 'required',
+            'kategori_perubahan' => 'required',
+            'tindak_lanjut' => 'required|min:10', // Minimal 10 karakter agar deskripsi pengerjaan jelas
+        ], [
+            // Custom message jika ingin bahasa Indonesia
+            'kategori_alat.required' => 'Pilih alat yang diperbaiki.',
+            'kategori_perubahan.required' => 'Pilih kategori perubahan.',
+            'tindak_lanjut.required' => 'Tindak lanjut wajib diisi agar terdokumentasi.',
+        ]);
+
         $ticket = Ticket::find($this->selectedTicketId);
 
         $ticket->update([
@@ -68,8 +80,10 @@ new class extends Component {
             'closed_at' => now(),
         ]);
 
+        // Tutup modal setelah berhasil
         $this->modal('closing-modal')->close();
-        session()->flash('monitor_msg', 'Tiket #' . $this->selectedTicketId . ' Berhasil Diselesaikan!');
+
+        session()->flash('message', 'Tiket berhasil diselesaikan dan ditutup.');
     }
 }; ?>
 
@@ -169,14 +183,14 @@ new class extends Component {
 
         <div class="grid gap-4">
             <div class="grid grid-cols-2 gap-4">
-                <flux:select wire:model="kategori_alat" label="Kategori Alat">
+                <flux:select wire:model="kategori_alat" label="Kategori Alat" required>
                     <option value="">-- Pilih --</option>
                     @foreach($listAlat as $alat)
                     <option value="{{ $alat }}">{{ $alat }}</option>
                     @endforeach
                 </flux:select>
 
-                <flux:select wire:model="kategori_perubahan" label="Kategori Perubahan">
+                <flux:select wire:model="kategori_perubahan" label="Kategori Perubahan" required>
                     <option value="">-- Pilih --</option>
                     @foreach($listPerubahan as $perubahan)
                     <option value="{{ $perubahan }}">{{ $perubahan }}</option>
@@ -184,8 +198,16 @@ new class extends Component {
                 </flux:select>
             </div>
 
-            <flux:textarea wire:model="tindak_lanjut" label="Tindak Lanjut" placeholder="Apa yang Anda lakukan untuk memperbaiki ini?" />
-            <flux:textarea wire:model="keterangan_it" label="Keterangan Tambahan" placeholder="Catatan internal IT (opsional)..." />
+            <flux:textarea
+                wire:model="tindak_lanjut"
+                label="Tindak Lanjut"
+                required
+                placeholder="Contoh: Mengganti cartridge printer dan test print." />
+
+            <flux:textarea
+                wire:model="keterangan_it"
+                label="Keterangan Tambahan (Opsional)"
+                placeholder="Catatan internal IT..." />
         </div>
 
         <div class="flex gap-2 justify-end">

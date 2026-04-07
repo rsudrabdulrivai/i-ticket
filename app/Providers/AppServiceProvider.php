@@ -29,6 +29,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('access-it-monitor', function (User $user) {
             return (bool) $user->is_it_staff === true;
         });
+
+        Gate::define('access-it-staff', function (User $user) {
+             return (bool) $user->is_it_staff === true;
+        });
     }
 
     /**

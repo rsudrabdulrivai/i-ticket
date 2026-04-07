@@ -8,6 +8,7 @@ new class extends Component {
     public $subject = '';
     public $description = '';
     public $location = '';
+    public $selectedKategoriLokasi = '';
     public $category = 'Hardware';
     public $priority = 'Medium';
     public $listRuangan = [
@@ -18,7 +19,11 @@ new class extends Component {
         'Penunjang'   => ['Laboratorium', 'Radiologi', 'Farmasi/Apotek', 'Gizi', 'Gudang Logistik', 'Kamar Jenazah']
     ];
 
-    // Mengambil data tiket terbaru milik user yang login
+    public function getAvailableRuanganProperty()
+    {
+        return $this->selectedKategoriLokasi ? $this->listRuangan[$this->selectedKategoriLokasi] : [];
+    }
+
     public function with(): array
     {
         return [
@@ -46,40 +51,44 @@ new class extends Component {
             'status' => 'Open',
         ]);
 
-        // Reset input form agar kosong kembali
         $this->reset(['subject', 'description', 'location', 'category', 'priority']);
 
         session()->flash('message', 'Laporan berhasil dikirim! Tim IT akan segera meluncur.');
-
-        // Tidak perlu redirect agar Livewire bisa update tabel di bawah secara instan
     }
 }; ?>
 
 <div class="space-y-10">
-    <div class="p-6 bg-white rounded-lg border border-gray-200 shadow-sm">
-        <form wire:submit="save">
+    <div class="p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
+        <form wire:submit="save" class="space-y-6">
             @if (session()->has('message'))
-            <div class="mb-4 p-4 bg-green-100 text-green-700 rounded-lg text-sm font-medium">
+            <div class="p-4 bg-green-50 text-green-700 rounded-lg text-sm font-medium border border-green-200">
                 {{ session('message') }}
             </div>
             @endif
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="mb-4 md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700">Judul Kendala (Misal: Printer Macet)</label>
-                    <input type="text" wire:model="subject" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-900">
-                    @error('subject') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <flux:input
+                    wire:model="subject"
+                    label="Judul Kendala"
+                    placeholder="Misal: Printer Macet"
+                    icon="pencil-square"
+                    class="md:col-span-2" />
 
-                <flux:select wire:model="location" label="Lokasi / Ruangan" placeholder="Pilih Ruangan..." searchable>
-                    <option value="">-- Pilih Lokasi --</option>
+                <flux:select wire:model.live="selectedKategoriLokasi" label="Bidang" placeholder="Pilih Bidang...">
+                    <option value="">-- Pilih Kelompok --</option>
+                    @foreach(array_keys($listRuangan) as $kat)
+                    <option value="{{ $kat }}">{{ $kat }}</option>
+                    @endforeach
+                </flux:select>
 
-                    @foreach($listRuangan as $kategori => $ruangans)
-                    <optgroup label="--- {{ strtoupper($kategori) }} ---">
-                        @foreach($ruangans as $ruang)
-                        <option value="{{ $ruang }}">{{ $ruang }}</option>
-                        @endforeach
-                    </optgroup>
+                <flux:select
+                    wire:model="location"
+                    label="Nama Ruangan"
+                    placeholder="Pilih Ruangan..."
+                    :disabled="empty($this->availableRuangan)">
+                    <option value="">-- Pilih Ruangan --</option>
+                    @foreach($this->availableRuangan as $ruang)
+                    <option value="{{ $ruang }}">{{ $ruang }}</option>
                     @endforeach
                 </flux:select>
 
@@ -89,17 +98,18 @@ new class extends Component {
                     <flux:select.option value="Network">Network (Internet/LAN)</flux:select.option>
                     <flux:select.option value="Sistem RS">Sistem RS (SIMRS/Aplikasi)</flux:select.option>
                 </flux:select>
+
+                <flux:textarea
+                    wire:model="description"
+                    label="Detail Masalah"
+                    placeholder="Jelaskan kendala Anda secara detail..."
+                    rows="4"
+                    class="md:col-span-2" />
             </div>
 
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700">Detail Masalah</label>
-                <textarea wire:model="description" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-gray-900"></textarea>
-                @error('description') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-            </div>
-
-            <button type="submit" class="w-full bg-indigo-600 text-white py-3 px-4 rounded-md hover:bg-indigo-700 font-bold transition duration-200">
+            <flux:button type="submit" variant="primary" class="w-full py-3" icon="paper-airplane">
                 KIRIM LAPORAN KE IT
-            </button>
+            </flux:button>
         </form>
     </div>
 
