@@ -21,21 +21,16 @@ new class extends Component {
     public $room = '';
     public $status = 'ready';
     public $editingId = null;
+    public $listRuangan = [];
 
     // Properti Filter & Logika Lokasi
     public $search = '';
     public $selectedKategoriLokasi = '';
-    public $listRuangan = [
-        'Rawat Jalan' => ['Poli Anak', 'Poli Dalam', 'Poli Gigi', 'Poli Mata', 'Poli THT', 'Poli Umum'],
-        'Rawat Inap'  => ['Bangsal Melati', 'Bangsal Mawar', 'Bangsal Dahlia', 'ICU', 'NICU/PICU'],
-        'IGD'         => ['Ruang Triase', 'Ruang Resusitasi', 'Poned'],
-        'Manajemen'   => ['Direksi', 'SDM/Kepegawaian', 'Keuangan', 'Rekam Medis', 'Tata Usaha'],
-        'Penunjang'   => ['Laboratorium', 'Radiologi', 'Farmasi/Apotek', 'Gizi', 'Gudang Logistik', 'Kamar Jenazah']
-    ];
 
     public function mount()
     {
         $this->updateStats();
+        $this->listRuangan = config('hospital.rooms');
     }
 
     public function updateStats()
