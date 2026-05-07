@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TicketExportController;
+use Livewire\Volt\Volt;
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Berikan dua nama sekaligus (dashboard dan home) agar Laravel tidak bingung
@@ -26,5 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/tickets/export-pdf', [TicketExportController::class, 'export'])->name('tickets.export-pdf');
 });
+
+Volt::route('/monitor', 'public-monitor')->name('public.monitor');
 
 require __DIR__ . '/settings.php';

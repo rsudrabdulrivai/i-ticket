@@ -6,19 +6,28 @@
 </head>
 
 <body class="min-h-screen bg-white dark:bg-zinc-800">
+    @if(!request()->routeIs('public.monitor'))
     <flux:sidebar sticky collapsible="mobile" class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
         <flux:sidebar.header>
-            <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
+            {{-- Gunakan route home/monitor jika tidak login --}}
+            <x-app-logo :sidebar="true" href="{{ auth()->check() ? route('dashboard') : route('public.monitor') }}" wire:navigate />
             <flux:sidebar.collapse class="lg:hidden" />
         </flux:sidebar.header>
 
-
         <flux:sidebar.nav>
             <flux:sidebar.group :heading="__('Menu')" class="grid">
+                {{-- Menu yang BOLEH dilihat tamu (Public) --}}
+                <flux:sidebar.item icon="chart-bar" :href="route('public.monitor')" :current="request()->routeIs('public.monitor')" wire:navigate>
+                    {{ __('Public Monitor') }}
+                </flux:sidebar.item>
+
+                {{-- Menu yang HANYA tampil jika sudah LOGIN --}}
+                @auth
                 <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
                     {{ __('Dashboard') }}
                 </flux:sidebar.item>
 
+                {{-- Cek apakah user adalah staff IT --}}
                 @if(auth()->user()->is_it_staff)
                 <flux:sidebar.item icon="computer-desktop" :href="route('it-monitor')" :current="request()->routeIs('it-monitor')" wire:navigate>
                     {{ __('Monitor Tiket') }}
@@ -30,21 +39,42 @@
                     {{ __('Inventaris') }}
                 </flux:sidebar.item>
                 @endif
+                @endauth
             </flux:sidebar.group>
         </flux:sidebar.nav>
 
+        {{-- Ganti bagian bawah sidebar yang lama --}}
         <flux:spacer />
 
+        @auth
+        {{-- Komponen ini hanya dipanggil jika sudah LOGIN --}}
         <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
+        @else
+        {{-- Tampilan untuk Tamu/Publik --}}
+        <div class="px-4 py-3">
+            <flux:button
+                icon="arrow-right-start-on-rectangle"
+                href="{{ route('login') }}"
+                variant="subtle"
+                size="sm"
+                class="w-full justify-start text-zinc-500"
+                wire:navigate>
+                {{ __('Login Staff') }}
+            </flux:button>
+        </div>
+        @endauth
     </flux:sidebar>
+    @endif
 
 
+    @if(!request()->routeIs('public.monitor'))
     <!-- Mobile User Menu -->
     <flux:header class="lg:hidden">
         <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
         <flux:spacer />
 
+        @auth
         <flux:dropdown position="top" align="end">
             <flux:profile
                 :initials="auth()->user()->initials()"
@@ -89,7 +119,18 @@
                 </form>
             </flux:menu>
         </flux:dropdown>
+        @else
+        <flux:button
+            icon="arrow-right-start-on-rectangle"
+            href="{{ route('login') }}"
+            variant="subtle"
+            size="sm"
+            wire:navigate>
+            {{ __('Login') }}
+        </flux:button>
+        @endauth
     </flux:header>
+    @endif
 
     {{ $slot }}
 

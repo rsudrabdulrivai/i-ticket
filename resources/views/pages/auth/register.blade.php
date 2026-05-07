@@ -63,5 +63,11 @@
             <span>{{ __('Sudah punya akun?') }}</span>
             <flux:link :href="route('login')" wire:navigate>{{ __('Login') }}</flux:link>
         </div>
+
+        <div class="mt-2 text-sm text-center text-zinc-600 dark:text-zinc-400">
+            <flux:link :href="route('public.monitor')" icon="chart-bar" wire:navigate>
+                {{ __('Lihat Public Monitor') }}
+            </flux:link>
+        </div>
     </div>
 </x-layouts::auth>
