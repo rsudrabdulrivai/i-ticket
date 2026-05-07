@@ -21,10 +21,10 @@
 
                 @if(auth()->user()->is_it_staff)
                 <flux:sidebar.item icon="computer-desktop" :href="route('it-monitor')" :current="request()->routeIs('it-monitor')" wire:navigate>
-                    {{ __('IT Monitor') }}
+                    {{ __('Monitor Tiket') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item icon="user-group" :href="route('it-staff')" :current="request()->routeIs('it-staff')" wire:navigate>
-                    {{ __('Manage IT Staff') }}
+                    {{ __('Manajemen Pengguna') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item icon="server-stack" :href="route('inventory')" :current="request()->routeIs('inventory')" wire:navigate>
                     {{ __('Inventaris') }}

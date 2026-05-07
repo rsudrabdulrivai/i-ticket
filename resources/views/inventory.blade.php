@@ -1,4 +1,4 @@
-<x-layouts::app :title="__('Inventory Asset IT')">
+<x-layouts::app :title="__('Inventaris Aset')">
     <div class="flex h-full w-full flex-1 flex-col gap-4">
         <div class="flex items-center justify-between">
             <h1 class="text-2xl font-bold text-gray-900">Manajemen Inventaris IT</h1>
