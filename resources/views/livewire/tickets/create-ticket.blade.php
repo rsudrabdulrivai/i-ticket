@@ -12,6 +12,9 @@ new class extends Component {
     public $category = 'Hardware';
     public $priority = 'Medium';
     public $listRuangan = [];
+    public $isBackdate = false;
+    public $backdateDate = '';
+    public $technician_id = '';
     // Di dalam class Volt
     public function mount()
     {
@@ -29,6 +32,7 @@ new class extends Component {
             'my_tickets' => Ticket::where('user_id', Auth::id())
                 ->latest()
                 ->get(),
+            'technicians' => \App\Models\User::where('is_it_staff', true)->get(),
         ];
     }
 
@@ -38,9 +42,11 @@ new class extends Component {
             'subject' => 'required|min:5',
             'description' => 'required',
             'location' => 'required',
+            'backdateDate' => 'required_if:isBackdate,true',
+            'technician_id' => 'required_if:isBackdate,true',
         ]);
 
-        Ticket::create([
+        $ticket = new Ticket([
             'user_id' => Auth::id(),
             'subject' => $this->subject,
             'description' => $this->description,
@@ -50,7 +56,18 @@ new class extends Component {
             'status' => 'Open',
         ]);
 
-        $this->reset(['subject', 'description', 'location', 'category', 'priority']);
+        if ($this->isBackdate && $this->backdateDate) {
+            $date = \Carbon\Carbon::parse($this->backdateDate);
+            $ticket->created_at = $date;
+            $ticket->status = 'Closed';
+            $ticket->technician_id = $this->technician_id;
+            $ticket->taken_at = $date->copy()->addMinutes(10);
+            $ticket->closed_at = $date->copy()->addMinutes(20);
+        }
+
+        $ticket->save();
+
+        $this->reset(['subject', 'description', 'location', 'category', 'priority', 'isBackdate', 'backdateDate', 'technician_id']);
 
         session()->flash('message', 'Laporan berhasil dikirim! Tim IT akan segera meluncur.');
     }
@@ -104,6 +121,23 @@ new class extends Component {
                     placeholder="Jelaskan kendala Anda secara detail..."
                     rows="4"
                     class="md:col-span-2" />
+
+                <div class="md:col-span-2 p-4 border border-gray-200 rounded-lg bg-gray-50/50 space-y-4">
+                    <flux:switch wire:model.live="isBackdate" label="Laporan Kendala Lampau (Backdate)" description="Aktifkan jika kendala ini terjadi di waktu lampau dan Anda baru melaporkannya sekarang." />
+
+                    @if($isBackdate)
+                    <div class="pt-2 space-y-4">
+                        <flux:input type="datetime-local" wire:model="backdateDate" label="Waktu Kejadian" />
+                        
+                        <flux:select wire:model="technician_id" label="Teknisi IT yang Menangani" placeholder="Pilih Teknisi...">
+                            <option value="">-- Pilih Teknisi --</option>
+                            @foreach($technicians as $tech)
+                            <option value="{{ $tech->id }}">{{ $tech->name }}</option>
+                            @endforeach
+                        </flux:select>
+                    </div>
+                    @endif
+                </div>
             </div>
 
             <flux:button type="submit" variant="primary" class="w-full py-3" icon="paper-airplane">
