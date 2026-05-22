@@ -117,9 +117,9 @@ new class extends Component {
         </flux:button>
     </div>
 
-    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
-        <table class="w-full text-sm text-left text-gray-500">
-            <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b">
+    <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-neutral-800 shadow-sm bg-white dark:bg-zinc-900">
+        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50 dark:bg-zinc-800/50 border-b dark:border-neutral-800">
                 <tr>
                     <th class="px-6 py-4">Nama User</th>
                     <th class="px-6 py-4">Email</th>
@@ -127,25 +127,25 @@ new class extends Component {
                     <th class="px-6 py-4 text-center">Aksi</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200">
+            <tbody class="divide-y divide-gray-200 dark:divide-neutral-800">
                 @forelse($users as $user)
-                <tr class="bg-white hover:bg-slate-50 transition">
+                <tr class="bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition">
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
-                            <div class="size-8 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center text-[10px] font-bold border border-indigo-200">
+                            <div class="size-8 bg-indigo-100 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 rounded-full flex items-center justify-center text-[10px] font-bold border border-indigo-200 dark:border-indigo-500/20">
                                 {{ strtoupper(substr($user->name, 0, 2)) }}
                             </div>
-                            <div class="font-bold text-gray-900">{{ $user->name }}</div>
+                            <div class="font-bold text-gray-900 dark:text-white">{{ $user->name }}</div>
                         </div>
                     </td>
                     <td class="px-6 py-4">
-                        <div class="text-gray-600">{{ $user->email }}</div>
+                        <div class="text-gray-600 dark:text-gray-300">{{ $user->email }}</div>
                     </td>
                     <td class="px-6 py-4">
                         @if($user->is_it_staff)
-                        <span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-[10px] font-bold border border-indigo-200 uppercase">IT Staff</span>
+                        <span class="px-2 py-1 bg-indigo-100 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 rounded text-[10px] font-bold border border-indigo-200 dark:border-indigo-500/20 uppercase">IT Staff</span>
                         @else
-                        <span class="px-2 py-1 bg-gray-100 text-gray-500 rounded text-[10px] font-bold border border-gray-200 uppercase">User Unit</span>
+                        <span class="px-2 py-1 bg-gray-100 dark:bg-gray-500/10 text-gray-500 dark:text-gray-400 rounded text-[10px] font-bold border border-gray-200 dark:border-gray-500/20 uppercase">User Unit</span>
                         @endif
                     </td>
                     <td class="px-6 py-4 text-center">
@@ -166,7 +166,7 @@ new class extends Component {
                                 icon="trash"
                                 class="text-red-600 hover:text-red-700" />
                             @else
-                            <span class="px-2 py-1 bg-gray-100 text-gray-500 rounded text-[10px] font-bold border border-gray-200 uppercase flex items-center justify-center">Anda</span>
+                            <span class="px-2 py-1 bg-gray-100 dark:bg-gray-500/10 text-gray-500 dark:text-gray-400 rounded text-[10px] font-bold border border-gray-200 dark:border-gray-500/20 uppercase flex items-center justify-center">Anda</span>
                             @endif
                         </div>
                     </td>
@@ -200,7 +200,7 @@ new class extends Component {
                 viewable
                 :required="!$editingUserId" />
 
-            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+            <div class="p-3 bg-slate-50 dark:bg-zinc-800 rounded-lg border border-slate-200 dark:border-zinc-700">
                 <flux:checkbox
                     wire:model="is_it_staff"
                     label="Berikan Akses Staf IT"

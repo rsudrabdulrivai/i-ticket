@@ -23,11 +23,9 @@
         </div>
         <livewire:tickets.ticket-stats />
 
-        <div class="relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white shadow-sm overflow-y-auto">
-            <div class="p-6">
-                <h2 class="text-xl font-bold text-gray-800 mb-4">Buat Pengaduan Kendala IT</h2>
-                <hr class="mb-6 border-neutral-100">
-
+        <div class="relative h-full flex-1 overflow-y-auto pr-1">
+            <div class="space-y-4">
+                <h2 class="text-xl font-bold text-gray-800 dark:text-zinc-100">Buat Pengaduan Kendala IT</h2>
                 <livewire:tickets.create-ticket />
             </div>
         </div>

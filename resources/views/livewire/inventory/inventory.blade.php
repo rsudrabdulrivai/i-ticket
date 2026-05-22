@@ -133,28 +133,28 @@ new class extends Component {
     @endif
 
     <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-        <div class="relative overflow-hidden rounded-xl border border-neutral-200 bg-white p-6 shadow-sm text-center">
-            <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Total Aset IT</p>
-            <p class="mt-2 text-4xl font-black text-slate-900">{{ $totalCount }}</p>
+        <div class="relative overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-zinc-900 p-6 shadow-sm text-center">
+            <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Total Aset IT</p>
+            <p class="mt-2 text-4xl font-black text-slate-900 dark:text-white">{{ $totalCount }}</p>
         </div>
-        <div class="relative overflow-hidden rounded-xl border border-neutral-200 bg-white p-6 shadow-sm text-center">
-            <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Kondisi Baik</p>
-            <p class="mt-2 text-4xl font-black text-green-600">{{ $readyCount }}</p>
+        <div class="relative overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-zinc-900 p-6 shadow-sm text-center">
+            <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Kondisi Baik</p>
+            <p class="mt-2 text-4xl font-black text-green-600 dark:text-green-500">{{ $readyCount }}</p>
         </div>
-        <div class="relative overflow-hidden rounded-xl border border-neutral-200 bg-white p-6 shadow-sm text-center">
-            <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Rusak / Repair</p>
-            <p class="mt-2 text-4xl font-black text-red-600">{{ $brokenCount }}</p>
+        <div class="relative overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-zinc-900 p-6 shadow-sm text-center">
+            <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Rusak / Repair</p>
+            <p class="mt-2 text-4xl font-black text-red-600 dark:text-red-500">{{ $brokenCount }}</p>
         </div>
     </div>
 
-    <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-200 dark:border-neutral-800 shadow-sm">
         <flux:input wire:model.live="search" icon="magnifying-glass" placeholder="Cari Kode Aset, Nama, atau Ruangan..." class="w-full md:w-96" />
         <flux:button wire:click="openAddModal" variant="primary" icon="plus" size="sm">Daftarkan Aset Baru</flux:button>
     </div>
 
-    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm bg-white">
-        <table class="w-full text-sm text-left">
-            <thead class="bg-gray-50 border-b text-[10px] uppercase font-black text-gray-400 tracking-widest">
+    <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-neutral-800 shadow-sm bg-white dark:bg-zinc-900">
+        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead class="bg-gray-50 dark:bg-zinc-800/50 border-b dark:border-neutral-800 text-[10px] uppercase font-black text-gray-400 dark:text-gray-500 tracking-widest">
                 <tr>
                     <th class="px-6 py-4">Informasi Aset</th>
                     <th class="px-6 py-4">Kategori & Brand</th>
@@ -164,17 +164,17 @@ new class extends Component {
                     <th class="px-6 py-4 text-right">Aksi</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-gray-100 dark:divide-neutral-800">
                 @forelse($items as $item)
-                <tr class="hover:bg-slate-50 transition group">
+                <tr class="hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition group">
                     <td class="px-6 py-4">
-                        <div class="font-bold text-gray-900">{{ $item->name }}</div>
-                        <div class="text-[10px] font-mono text-gray-400 tracking-tighter uppercase">{{ $item->asset_code }}</div>
+                        <div class="font-bold text-gray-900 dark:text-white">{{ $item->name }}</div>
+                        <div class="text-[10px] font-mono text-gray-400 dark:text-gray-500 tracking-tighter uppercase">{{ $item->asset_code }}</div>
                     </td>
 
                     <td class="px-6 py-4">
-                        <div class="text-xs font-bold text-gray-700">{{ $item->category }}</div>
-                        <div class="text-[10px] text-gray-400 font-medium uppercase tracking-widest">{{ $item->brand }}</div>
+                        <div class="text-xs font-bold text-gray-700 dark:text-gray-300">{{ $item->category }}</div>
+                        <div class="text-[10px] text-gray-400 dark:text-gray-500 font-medium uppercase tracking-widest">{{ $item->brand }}</div>
                     </td>
 
                     <td class="px-6 py-4">
@@ -188,12 +188,12 @@ new class extends Component {
                         }
 
                         $bidangColor = match($bidang) {
-                        'Rawat Jalan' => 'text-emerald-600 bg-emerald-50',
-                        'Rawat Inap' => 'text-blue-600 bg-blue-50',
-                        'IGD' => 'text-red-600 bg-red-50',
-                        'Manajemen' => 'text-purple-600 bg-purple-50',
-                        'Penunjang' => 'text-amber-600 bg-amber-50',
-                        default => 'text-gray-600 bg-gray-50'
+                        'Rawat Jalan' => 'text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-400',
+                        'Rawat Inap' => 'text-blue-600 bg-blue-50 dark:bg-blue-500/10 dark:text-blue-400',
+                        'IGD' => 'text-red-600 bg-red-50 dark:bg-red-500/10 dark:text-red-400',
+                        'Manajemen' => 'text-purple-600 bg-purple-50 dark:bg-purple-500/10 dark:text-purple-400',
+                        'Penunjang' => 'text-amber-600 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400',
+                        default => 'text-gray-600 bg-gray-50 dark:bg-gray-500/10 dark:text-gray-400'
                         };
                         @endphp
                         <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase {{ $bidangColor }}">
@@ -203,8 +203,8 @@ new class extends Component {
 
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-2">
-                            <flux:icon.map-pin size="sm" class="text-gray-300" />
-                            <span class="text-xs font-semibold text-gray-600">{{ $item->room }}</span>
+                            <flux:icon.map-pin size="sm" class="text-gray-300 dark:text-gray-600" />
+                            <span class="text-xs font-semibold text-gray-600 dark:text-gray-300">{{ $item->room }}</span>
                         </div>
                     </td>
 

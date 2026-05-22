@@ -209,7 +209,7 @@ new class extends Component {
         {{ session('monitor_msg') }}
     </div>
     @endif
-    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
+    <div class="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-200 dark:border-neutral-800 shadow-sm space-y-4">
         {{-- Row Atas: Search & Status --}}
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div class="w-full md:w-1/2">
@@ -219,16 +219,16 @@ new class extends Component {
                     placeholder="Cari ID, Judul, Pelapor, atau Lokasi..." />
             </div>
 
-            <div class="flex p-1 bg-slate-100 rounded-lg border border-slate-200 w-full md:w-auto overflow-x-auto">
-                <button wire:click="$set('statusFilter', '')" class="flex-1 md:flex-none px-3 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest transition {{ $statusFilter === '' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500' }}">Semua</button>
-                <button wire:click="$set('statusFilter', 'Open')" class="flex-1 md:flex-none px-3 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest transition {{ $statusFilter === 'Open' ? 'bg-white shadow-sm text-red-600' : 'text-gray-500' }}">Open</button>
-                <button wire:click="$set('statusFilter', 'On Progress')" class="flex-1 md:flex-none px-3 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest transition {{ $statusFilter === 'On Progress' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500' }}">Proses</button>
-                <button wire:click="$set('statusFilter', 'Closed')" class="flex-1 md:flex-none px-3 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest transition {{ $statusFilter === 'Closed' ? 'bg-white shadow-sm text-green-600' : 'text-gray-500' }}">Selesai</button>
+            <div class="flex p-1 bg-slate-100 dark:bg-zinc-800 rounded-lg border border-slate-200 dark:border-zinc-700 w-full md:w-auto overflow-x-auto">
+                <button wire:click="$set('statusFilter', '')" class="flex-1 md:flex-none px-3 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest transition {{ $statusFilter === '' ? 'bg-white dark:bg-zinc-700 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' }}">Semua</button>
+                <button wire:click="$set('statusFilter', 'Open')" class="flex-1 md:flex-none px-3 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest transition {{ $statusFilter === 'Open' ? 'bg-white dark:bg-zinc-700 shadow-sm text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' }}">Open</button>
+                <button wire:click="$set('statusFilter', 'On Progress')" class="flex-1 md:flex-none px-3 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest transition {{ $statusFilter === 'On Progress' ? 'bg-white dark:bg-zinc-700 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' }}">Proses</button>
+                <button wire:click="$set('statusFilter', 'Closed')" class="flex-1 md:flex-none px-3 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest transition {{ $statusFilter === 'Closed' ? 'bg-white dark:bg-zinc-700 shadow-sm text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' }}">Selesai</button>
             </div>
         </div>
 
         {{-- Baris 2: Filter Dinamis --}}
-        <div class="flex flex-col md:flex-row gap-3 pt-4 border-t border-gray-100">
+        <div class="flex flex-col md:flex-row gap-3 pt-4 border-t border-gray-100 dark:border-neutral-800">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:flex gap-3 flex-grow">
 
                 {{-- Filter Bidang/Unit --}}
@@ -278,9 +278,9 @@ new class extends Component {
             </flux:button>
         </div>
 
-        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
-            <table class="w-full text-sm text-left text-gray-500">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b">
+        <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-neutral-800 shadow-sm bg-white dark:bg-zinc-900">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50 dark:bg-zinc-800/50 border-b dark:border-neutral-800">
                     <tr>
                         <th class="px-6 py-4">Info Tiket</th>
                         <th class="px-6 py-4">Pelapor & Lokasi</th>
@@ -290,46 +290,46 @@ new class extends Component {
                         <th class="px-6 py-4 text-center">Aksi IT</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200">
+                <tbody class="divide-y divide-gray-200 dark:divide-neutral-800">
                     @forelse($all_tickets as $ticket)
-                    <tr class="bg-white hover:bg-slate-50 transition">
+                    <tr class="bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition">
                         <td class="px-6 py-4">
-                            <div class="font-bold text-gray-900">#{{ $ticket->id }} - {{ $ticket->subject }}</div>
-                            <div class="text-xs text-gray-400">{{ $ticket->created_at->diffForHumans() }}</div>
+                            <div class="font-bold text-gray-900 dark:text-white">#{{ $ticket->id }} - {{ $ticket->subject }}</div>
+                            <div class="text-xs text-gray-400 dark:text-gray-500">{{ $ticket->created_at->diffForHumans() }}</div>
                         </td>
                         <td class="px-6 py-4">
-                            <div class="text-gray-900 font-medium">{{ $ticket->user->name }}</div>
-                            <div class="text-[10px] text-indigo-600 font-bold uppercase tracking-wider">{{ $ticket->location }}</div>
+                            <div class="text-gray-900 dark:text-gray-200 font-medium">{{ $ticket->user->name }}</div>
+                            <div class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold uppercase tracking-wider">{{ $ticket->location }}</div>
                         </td>
                         <td class="px-6 py-4">
-                            <span class="block text-xs text-gray-500 mb-1">{{ $ticket->category }}</span>
+                            <span class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{ $ticket->category }}</span>
                             @if($ticket->priority == 'Cito')
-                            <span class="px-2 py-0.5 bg-red-600 text-white text-[10px] rounded-full font-black animate-bounce inline-block">Cito</span>
+                            <span class="px-2 py-0.5 bg-red-600 dark:bg-red-500/20 text-white dark:text-red-400 text-[10px] rounded-full font-black animate-bounce inline-block">Cito</span>
                             @else
-                            <span class="text-xs font-bold text-gray-700">{{ $ticket->priority }}</span>
+                            <span class="text-xs font-bold text-gray-700 dark:text-gray-300">{{ $ticket->priority }}</span>
                             @endif
                         </td>
                         <td class="px-6 py-4">
                             @if($ticket->status == 'Open')
-                            <span class="px-2 py-1 bg-red-100 text-red-700 rounded text-[10px] font-bold border border-red-200">OPEN</span>
+                            <span class="px-2 py-1 bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 rounded text-[10px] font-bold border border-red-200 dark:border-red-500/20">OPEN</span>
                             @elseif($ticket->status == 'On Progress')
-                            <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-[10px] font-bold border border-blue-200">ON PROGRESS</span>
+                            <span class="px-2 py-1 bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 rounded text-[10px] font-bold border border-blue-200 dark:border-blue-500/20">ON PROGRESS</span>
                             @elseif($ticket->status == 'Cancelled')
-                            <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-[10px] font-bold border border-gray-200">CANCELLED</span>
+                            <span class="px-2 py-1 bg-gray-100 dark:bg-gray-500/10 text-gray-700 dark:text-gray-400 rounded text-[10px] font-bold border border-gray-200 dark:border-gray-500/20">CANCELLED</span>
                             @else
-                            <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-[10px] font-bold border border-green-200">CLOSED</span>
+                            <span class="px-2 py-1 bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400 rounded text-[10px] font-bold border border-green-200 dark:border-green-500/20">CLOSED</span>
                             @endif
                         </td>
                         <td class="px-6 py-4">
                             @if($ticket->technician_id)
                             <div class="flex items-center gap-2">
-                                <div class="size-7 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center text-[10px] font-bold border border-indigo-200">
+                                <div class="size-7 bg-indigo-100 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 rounded-full flex items-center justify-center text-[10px] font-bold border border-indigo-200 dark:border-indigo-500/20">
                                     {{ strtoupper(substr($ticket->technician->name, 0, 2)) }}
                                 </div>
-                                <span class="text-xs font-medium text-gray-700">{{ $ticket->technician->name }}</span>
+                                <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{{ $ticket->technician->name }}</span>
                             </div>
                             @else
-                            <span class="text-xs text-gray-400 italic font-light tracking-tight">Menunggu Teknisi</span>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 italic font-light tracking-tight">Menunggu Teknisi</span>
                             @endif
                         </td>
                         <td class="px-6 py-4 text-center">
