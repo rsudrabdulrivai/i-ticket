@@ -6,7 +6,7 @@
             <flux:select.option value="Low">Low</flux:select.option>
             <flux:select.option value="Medium">Medium</flux:select.option>
             <flux:select.option value="High">High</flux:select.option>
-            <flux:select.option value="Urgent">Urgent</flux:select.option>
+            <flux:select.option value="Cito">Cito</flux:select.option>
         </flux:select>
 
         <div class="flex justify-end gap-2 pt-4">

@@ -12,13 +12,10 @@ class extends Component {
     public $search = '';
     public $statusFilter = '';
 
-    // Otomatis dipanggil setiap kali variabel $search diubah via wire:model
     public function updatedSearch()
     {
         $this->resetPage();
     }
-
-    // Otomatis dipanggil setiap kali variabel $statusFilter diubah
     public function updatedStatusFilter()
     {
         $this->resetPage();
@@ -28,20 +25,19 @@ class extends Component {
     {
         $query = Ticket::with(['user', 'technician']);
 
-        if ($this->search) {
-            $query->where(function ($q) {
-                $q->where('id', 'like', '%' . $this->search . '%')
-                    ->orWhere('subject', 'like', '%' . $this->search . '%')
-                    ->orWhere('location', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('user', function ($u) {
-                        $u->where('name', 'like', '%' . $this->search . '%');
-                    });
+        $search = trim($this->search);
+        $query->when($search, function ($q) use ($search) {
+            $q->where(function ($sub) use ($search) {
+                $sub->where('id', 'like', '%' . $search . '%')
+                    ->orWhere('subject', 'like', '%' . $search . '%')
+                    ->orWhere('location', 'like', '%' . $search . '%')
+                    ->orWhereHas('user', fn($u) => $u->where('name', 'like', '%' . $search . '%'));
             });
-        }
+        });
 
-        if ($this->statusFilter) {
-            $query->where('status', $this->statusFilter);
-        }
+        $query->when($this->statusFilter, function ($q) {
+            $q->where('status', $this->statusFilter);
+        });
 
         return [
             'tickets' => $query->latest()->paginate(10),
@@ -57,6 +53,7 @@ class extends Component {
 
 <div class="min-h-screen bg-[#0F172A] text-slate-200 font-sans">
     <div class="w-full p-0 space-y-0">
+        {{-- Header --}}
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 p-6 bg-slate-900/50 border-b border-slate-700/50">
             <div>
                 <h1 class="text-3xl font-black tracking-tight text-white flex items-center gap-3">
@@ -73,16 +70,17 @@ class extends Component {
                     <input wire:model.live.debounce.300ms="search"
                         type="text"
                         placeholder="Cari lokasi/masalah..."
-                        class="bg-transparent border-none focus:ring-0 text-sm w-48 md:w-64 placeholder:text-slate-500">
+                        class="bg-transparent border-none focus:outline-none focus:ring-0 focus:border-none text-sm w-48 md:w-64 placeholder:text-slate-500"
+                        autocomplete="off">
                 </div>
 
                 @auth
-                <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-indigo-500/20">
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-indigo-500/20">
                     <x-flux::icon.home class="size-4" />
                     <span>Dashboard</span>
                 </a>
                 @else
-                <a href="{{ route('login') }}" wire:navigate class="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-bold rounded-xl border border-slate-700 transition-all">
+                <a href="{{ route('login') }}" class="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-bold rounded-xl border border-slate-700 transition-all">
                     <x-flux::icon.arrow-right-start-on-rectangle class="size-4" />
                     <span>Staff Login</span>
                 </a>
@@ -91,30 +89,26 @@ class extends Component {
         </div>
 
         <div class="p-6 space-y-8">
-
             {{-- Statistik Cards --}}
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 @foreach([
-                ['label' => 'Total Tiket', 'val' => $stats['total'], 'color' => 'indigo', 'icon' => 'ticket'],
-                ['label' => 'Menunggu', 'val' => $stats['open'], 'color' => 'red', 'icon' => 'clock'],
-                ['label' => 'Diproses', 'val' => $stats['process'], 'color' => 'blue', 'icon' => 'arrow-path'],
-                ['label' => 'Selesai', 'val' => $stats['closed'], 'color' => 'green', 'icon' => 'check-circle'],
+                ['label' => 'Total Tiket', 'val' => $stats['total'], 'color' => 'indigo'],
+                ['label' => 'Menunggu', 'val' => $stats['open'], 'color' => 'red'],
+                ['label' => 'Diproses', 'val' => $stats['process'], 'color' => 'blue'],
+                ['label' => 'Selesai', 'val' => $stats['closed'], 'color' => 'green'],
                 ] as $s)
                 <div class="bg-slate-800/40 border border-slate-700/50 p-5 rounded-3xl backdrop-blur-sm">
                     <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">{{ $s['label'] }}</p>
                     <div class="flex justify-between items-end mt-2">
                         <h2 class="text-4xl font-black text-{{ $s['color'] }}-500">{{ $s['val'] }}</h2>
-                        <div class="p-2 bg-{{ $s['color'] }}-500/10 rounded-xl text-{{ $s['color'] }}-500">
-                            {{-- Icon placeholder --}}
-                        </div>
                     </div>
                 </div>
                 @endforeach
             </div>
 
-            {{-- Main Table --}}
+            {{-- Main Table Live Monitor --}}
             <div class="bg-slate-800/30 border border-slate-700/50 rounded-[2rem] overflow-hidden backdrop-blur-md">
-                <table class="w-full text-left border-collapse">
+                <table class="w-full text-left border-collapse" wire:key="live-monitor-table-{{ $search }}">
                     <thead>
                         <tr class="bg-slate-800/60 border-b border-slate-700">
                             <th class="p-5 text-xs font-bold text-slate-400 uppercase">Informasi</th>
@@ -147,10 +141,11 @@ class extends Component {
                                 $statusClasses = [
                                 'Open' => 'bg-red-500/10 text-red-500 border-red-500/20 animate-pulse',
                                 'On Progress' => 'bg-blue-500/10 text-blue-500 border-blue-500/20',
+                                'Cancelled' => 'bg-gray-500/10 text-gray-400 border-gray-500/20',
                                 'Closed' => 'bg-green-500/10 text-green-500 border-green-500/20'
                                 ];
                                 @endphp
-                                <span class="px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border {{ $statusClasses[$ticket->status] ?? '' }}">
+                                <span class="px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border {{ $statusClasses[$ticket->status] ?? 'bg-slate-500/10' }}">
                                     {{ $ticket->status }}
                                 </span>
                             </td>
@@ -174,6 +169,9 @@ class extends Component {
                         @endforelse
                     </tbody>
                 </table>
+                <div class="p-4 border-t border-slate-700">
+                    {{ $tickets->links() }}
+                </div>
             </div>
 
             {{-- Footer Info --}}
@@ -186,3 +184,4 @@ class extends Component {
             </div>
         </div>
     </div>
+</div>

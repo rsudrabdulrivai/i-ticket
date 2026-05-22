@@ -22,6 +22,7 @@ new class extends Component {
     public $listPerubahan = ['Perbaikan Ringan', 'Penggantian Komponen', 'Update Konfigurasi', 'Edukasi User', 'Lain-lain'];
     public $listAlat = ['Komputer/PC', 'Printer/Scanner', 'Jaringan/Internet', 'Aplikasi/SIMRS', 'Lain-lain'];
     public $priority = 'Medium';
+    public $catatan_batal = '';
 
     public function with(): array
     {
@@ -175,6 +176,31 @@ new class extends Component {
 
         session()->flash('message', 'Tiket berhasil diselesaikan dan ditutup.');
     }
+    public function openCancelModal($id)
+    {
+        $this->selectedTicketId = $id;
+        $this->catatan_batal = '';
+        $this->modal('cancel-modal')->show();
+    }
+
+    public function saveCancel()
+    {
+        $this->validate([
+            'catatan_batal' => 'required|min:5'
+        ]);
+
+        $ticket = Ticket::find($this->selectedTicketId);
+
+        // Jangan isi closed_at jika Anda ingin membedakan Closed vs Cancelled
+        $ticket->update([
+            'status' => 'Cancelled',
+            'keterangan_it' => 'Dibatalkan: ' . $this->catatan_batal,
+            // Hapus 'closed_at' => now(), agar tidak terdeteksi sebagai tiket selesai
+        ]);
+
+        $this->modal('cancel-modal')->close();
+        session()->flash('monitor_msg', 'Tiket #' . $this->selectedTicketId . ' telah dibatalkan.');
+    }
 }; ?>
 
 <div class="space-y-6">
@@ -277,8 +303,8 @@ new class extends Component {
                         </td>
                         <td class="px-6 py-4">
                             <span class="block text-xs text-gray-500 mb-1">{{ $ticket->category }}</span>
-                            @if($ticket->priority == 'Urgent')
-                            <span class="px-2 py-0.5 bg-red-600 text-white text-[10px] rounded-full font-black animate-bounce inline-block">URGENT</span>
+                            @if($ticket->priority == 'Cito')
+                            <span class="px-2 py-0.5 bg-red-600 text-white text-[10px] rounded-full font-black animate-bounce inline-block">Cito</span>
                             @else
                             <span class="text-xs font-bold text-gray-700">{{ $ticket->priority }}</span>
                             @endif
@@ -288,6 +314,8 @@ new class extends Component {
                             <span class="px-2 py-1 bg-red-100 text-red-700 rounded text-[10px] font-bold border border-red-200">OPEN</span>
                             @elseif($ticket->status == 'On Progress')
                             <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-[10px] font-bold border border-blue-200">ON PROGRESS</span>
+                            @elseif($ticket->status == 'Cancelled')
+                            <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-[10px] font-bold border border-gray-200">CANCELLED</span>
                             @else
                             <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-[10px] font-bold border border-green-200">CLOSED</span>
                             @endif
@@ -308,9 +336,18 @@ new class extends Component {
                             <div class="flex justify-center gap-2">
                                 @if($ticket->status == 'Open')
                                 @if($ticket->status == 'Open')
-                                <flux:button wire:click="openTakeModal({{ $ticket->id }})" variant="primary" size="sm">
-                                    Ambil Tugas
-                                </flux:button>
+                                <div class="flex flex-col items-center gap-2">
+                                    {{-- Aksi Utama --}}
+                                    <flux:button wire:click="openTakeModal({{ $ticket->id }})" variant="primary" size="sm" class="w-full">
+                                        Ambil Tugas
+                                    </flux:button>
+
+                                    {{-- Aksi Sekunder (dibuat lebih kecil/halus) --}}
+                                    <button wire:click="openCancelModal({{ $ticket->id }})"
+                                        class="text-[10px] text-red-500 hover:text-red-700 hover:underline font-medium transition">
+                                        Batalkan Tiket
+                                    </button>
+                                </div>
                                 @endif
                                 @elseif($ticket->status == 'On Progress')
                                 <flux:button wire:click="openClosingModal({{ $ticket->id }})" variant="primary" size="sm" class="bg-green-600 hover:bg-green-700 border-none">
@@ -337,4 +374,5 @@ new class extends Component {
         <x-tickets.closing-modal :list-alat="$listAlat" :list-perubahan="$listPerubahan" />
         <x-tickets.detail-modal :detail-ticket="$detailTicket" />
         <x-take-ticket-modal />
+        <x-tickets.cancel-modal />
     </div>
