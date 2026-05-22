@@ -21,6 +21,7 @@ new class extends Component {
     public $unitFilter = '';
     public $listPerubahan = ['Perbaikan Ringan', 'Penggantian Komponen', 'Update Konfigurasi', 'Edukasi User', 'Lain-lain'];
     public $listAlat = ['Komputer/PC', 'Printer/Scanner', 'Jaringan/Internet', 'Aplikasi/SIMRS', 'Lain-lain'];
+    public $priority = 'Medium';
 
     public function with(): array
     {
@@ -72,6 +73,29 @@ new class extends Component {
         ];
     }
 
+    public function confirmTakeTicket()
+    {
+        $this->validate(['priority' => 'required']);
+
+        $ticket = Ticket::find($this->selectedTicketId);
+        $ticket->update([
+            'status' => 'On Progress',
+            'priority' => $this->priority, // Simpan prioritas
+            'technician_id' => Auth::id(),
+            'taken_at' => now(),
+        ]);
+
+        $this->modal('take-ticket-modal')->close();
+        session()->flash('monitor_msg', 'Tiket #' . $this->selectedTicketId . ' berhasil diambil.');
+    }
+
+    // Tambahkan fungsi ini di dalam class
+    public function openTakeModal($id)
+    {
+        $this->selectedTicketId = $id;
+        $this->modal('take-ticket-modal')->show();
+    }
+
     public function updatedUnitFilter()
     {
         $this->reset('locationFilter');
@@ -107,7 +131,6 @@ new class extends Component {
 
     public function exportPdf()
     {
-        // Kumpulkan semua filter yang sedang aktif
         $params = [
             'search'   => $this->search,
             'unit'     => $this->unitFilter,
@@ -116,8 +139,11 @@ new class extends Component {
             'status'   => $this->statusFilter,
         ];
 
-        // Redirect ke route export dengan membawa parameter filter
-        return redirect()->route('tickets.export-pdf', $params);
+        // Generate URL-nya
+        $url = route('tickets.export-pdf', $params);
+
+        // Kirim perintah ke browser untuk membuka di tab baru
+        $this->js("window.open('{$url}', '_blank')");
     }
 
     public function saveClosing()
@@ -281,9 +307,11 @@ new class extends Component {
                         <td class="px-6 py-4 text-center">
                             <div class="flex justify-center gap-2">
                                 @if($ticket->status == 'Open')
-                                <flux:button wire:click="updateStatus({{ $ticket->id }}, 'On Progress')" variant="primary" size="sm">
+                                @if($ticket->status == 'Open')
+                                <flux:button wire:click="openTakeModal({{ $ticket->id }})" variant="primary" size="sm">
                                     Ambil Tugas
                                 </flux:button>
+                                @endif
                                 @elseif($ticket->status == 'On Progress')
                                 <flux:button wire:click="openClosingModal({{ $ticket->id }})" variant="primary" size="sm" class="bg-green-600 hover:bg-green-700 border-none">
                                     Selesaikan
@@ -306,7 +334,7 @@ new class extends Component {
                 </tbody>
             </table>
         </div>
-
-        {{-- Letakkan di bagian bawah, di luar table --}}
-        <x-ticket-detail-modal :ticket="$detailTicket" />
+        <x-tickets.closing-modal :list-alat="$listAlat" :list-perubahan="$listPerubahan" />
+        <x-tickets.detail-modal :detail-ticket="$detailTicket" />
+        <x-take-ticket-modal />
     </div>

@@ -16,11 +16,6 @@
 
         <flux:sidebar.nav>
             <flux:sidebar.group :heading="__('Menu')" class="grid">
-                {{-- Menu yang BOLEH dilihat tamu (Public) --}}
-                <flux:sidebar.item icon="chart-bar" :href="route('public.monitor')" :current="request()->routeIs('public.monitor')" wire:navigate>
-                    {{ __('Public Monitor') }}
-                </flux:sidebar.item>
-
                 {{-- Menu yang HANYA tampil jika sudah LOGIN --}}
                 @auth
                 <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
@@ -37,6 +32,10 @@
                 </flux:sidebar.item>
                 <flux:sidebar.item icon="server-stack" :href="route('inventory')" :current="request()->routeIs('inventory')" wire:navigate>
                     {{ __('Inventaris') }}
+                </flux:sidebar.item>
+                 {{-- Menu yang BOLEH dilihat tamu (Public) --}}
+                <flux:sidebar.item icon="chart-bar" :href="route('public.monitor')" :current="request()->routeIs('public.monitor')" wire:navigate>
+                    {{ __('Public Monitor') }}
                 </flux:sidebar.item>
                 @endif
                 @endauth
