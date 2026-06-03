@@ -90,11 +90,15 @@ new class extends Component {
                     icon="pencil-square"
                     class="md:col-span-2" />
 
-                <flux:select wire:model="category" label="Kategori Kendala" placeholder="Pilih Kategori...">
-                    <flux:select.option value="Hardware">Hardware (Komputer/Printer)</flux:select.option>
-                    <flux:select.option value="Software">Software (Windows/Office)</flux:select.option>
-                    <flux:select.option value="Network">Network (Internet/LAN)</flux:select.option>
-                    <flux:select.option value="Sistem RS">Sistem RS (SIMRS/Aplikasi)</flux:select.option>
+                <flux:select
+                    wire:model="category"
+                    label="Kategori Kendala"
+                    placeholder="Pilih Kategori...">
+                    @foreach(config('options.categories') as $value => $label)
+                    <flux:select.option value="{{ $value }}">
+                        {{ $label }}
+                    </flux:select.option>
+                    @endforeach
                 </flux:select>
 
                 <flux:select wire:model.live="selectedKategoriLokasi" label="Bidang" placeholder="Pilih Bidang...">
@@ -127,8 +131,42 @@ new class extends Component {
 
                     @if($isBackdate)
                     <div class="pt-2 space-y-4">
-                        <flux:input type="datetime-local" wire:model="backdateDate" label="Waktu Kejadian" />
-                        
+                        <div class="w-full" wire:ignore>
+                            <div x-data="{
+                                picker: null,
+                                init() {
+                                    // Menunggu sampai Flux benar-benar selesai me-render input
+                                    $nextTick(() => {
+                                        let inputElement = $el.querySelector('input');
+                                        if (inputElement) {
+                                            this.picker = flatpickr(inputElement, {
+                                                enableTime: true,
+                                                time_24hr: true,
+                                                dateFormat: 'Y-m-d H:i',
+                                                defaultDate: $wire.get('backdateDate') || null,
+                                                onChange: (selectedDates, dateStr) => {
+                                                    // Menggunakan $wire bawaan Alpine (lebih aman dari bocor)
+                                                    $wire.set('backdateDate', dateStr);
+                                                }
+                                            });
+                                        }
+                                    });
+
+                                    // Pantau jika nilai di-reset dari backend
+                                    $watch('$wire.backdateDate', value => {
+                                        if (!value && this.picker) this.picker.clear();
+                                    });
+                                }
+                            }">
+                                <flux:input
+                                    type="text"
+                                    label="Waktu Kejadian"
+                                    placeholder="Pilih tanggal dan jam kejadian..."
+                                    icon="calendar"
+                                    class="bg-slate-50/50" />
+                            </div>
+                        </div>
+
                         <flux:select wire:model="technician_id" label="Teknisi IT yang Menangani" placeholder="Pilih Teknisi...">
                             <option value="">-- Pilih Teknisi --</option>
                             @foreach($technicians as $tech)
