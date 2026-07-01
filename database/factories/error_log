@@ -1,0 +1,8 @@
+[25-May-2026 05:24:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Factories\Factory" not found in /home/iticketm/public_html/i-ticket/database/factories/UserFactory.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/database/factories/UserFactory.php on line 13
+[25-May-2026 05:24:02 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Factories\Factory" not found in /home/iticketm/public_html/i-ticket/database/factories/UserFactory.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/database/factories/UserFactory.php on line 13

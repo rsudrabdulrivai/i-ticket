@@ -26,6 +26,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('inventory');
 
     Route::get('/tickets/export-pdf', [TicketExportController::class, 'export'])->name('tickets.export-pdf');
+
+    Volt::route('/knowledge', 'knowledge.index')->name('knowledge.index');
+
+    Volt::route('/knowledge/{slug}', 'knowledge.show')->name('knowledge.show');
 });
 
 Volt::route('/monitor', 'public-monitor')->name('public.monitor');

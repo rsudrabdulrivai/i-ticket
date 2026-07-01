@@ -1,0 +1,52 @@
+[25-May-2026 02:02:14 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/iticketm/public_html/routes/console.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/routes/console.php on line 6
+[25-May-2026 02:02:15 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/iticketm/public_html/routes/web.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/routes/web.php on line 7
+[25-May-2026 02:06:44 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/iticketm/public_html/routes/web.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/routes/web.php on line 7
+[25-May-2026 02:11:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/iticketm/public_html/routes/console.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/routes/console.php on line 6
+[25-May-2026 05:20:40 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/iticketm/public_html/i-ticket/routes/console.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/routes/console.php on line 6
+[25-May-2026 05:20:41 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/iticketm/public_html/i-ticket/routes/console.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/routes/console.php on line 6
+[25-May-2026 05:20:41 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/iticketm/public_html/i-ticket/routes/settings.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/routes/settings.php on line 6
+[25-May-2026 05:20:43 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/iticketm/public_html/i-ticket/routes/settings.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/routes/settings.php on line 6
+[25-May-2026 05:20:43 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/iticketm/public_html/i-ticket/routes/web.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/routes/web.php on line 7
+[25-May-2026 05:20:44 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/iticketm/public_html/i-ticket/routes/web.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/routes/web.php on line 7
+[25-May-2026 05:38:37 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/iticketm/public_html/i-ticket/routes/console.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/routes/console.php on line 6
+[25-May-2026 05:38:38 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/iticketm/public_html/i-ticket/routes/settings.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/routes/settings.php on line 6
+[25-May-2026 05:38:38 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/iticketm/public_html/i-ticket/routes/web.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/routes/web.php on line 7

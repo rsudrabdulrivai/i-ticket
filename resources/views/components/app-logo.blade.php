@@ -3,14 +3,14 @@
 ])
 
 @if($sidebar)
-    <flux:sidebar.brand name="iTicket" {{ $attributes }}>
+    <flux:sidebar.brand name="i-Ticket" {{ $attributes }}>
         <x-slot name="logo" class="h-10">
             <!-- Ganti SVG dengan IMG -->
             <img src="{{ asset('logo.png') }}" class="h-10 rounded-md" alt="Logo">
         </x-slot>
     </flux:sidebar.brand>
 @else
-    <flux:brand name="iTicket" {{ $attributes }}>
+    <flux:brand name="i-Ticket" {{ $attributes }}>
         <x-slot name="logo" class="h-10">
             <!-- Ganti SVG dengan IMG -->
             <img src="{{ asset('logo.png') }}" class="h-10 rounded-md" alt="Logo">

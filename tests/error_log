@@ -1,0 +1,24 @@
+[25-May-2026 05:20:47 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function pest() in /home/iticketm/public_html/i-ticket/tests/Pest.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/tests/Pest.php on line 17
+[25-May-2026 05:20:48 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function pest() in /home/iticketm/public_html/i-ticket/tests/Pest.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/tests/Pest.php on line 17
+[25-May-2026 05:20:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Testing\TestCase" not found in /home/iticketm/public_html/i-ticket/tests/TestCase.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/tests/TestCase.php on line 8
+[25-May-2026 05:20:49 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Testing\TestCase" not found in /home/iticketm/public_html/i-ticket/tests/TestCase.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/tests/TestCase.php on line 8
+[25-May-2026 05:38:41 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function pest() in /home/iticketm/public_html/i-ticket/tests/Pest.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/tests/Pest.php on line 17
+[25-May-2026 05:38:41 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Testing\TestCase" not found in /home/iticketm/public_html/i-ticket/tests/TestCase.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/tests/TestCase.php on line 8

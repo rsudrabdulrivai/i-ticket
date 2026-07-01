@@ -5,8 +5,11 @@ use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
+use Livewire\WithPagination;
 
 new class extends Component {
+    use WithPagination;
+
     public $search = '';
     public $statusFilter = '';
     public $categoryFilter = '';
@@ -23,6 +26,12 @@ new class extends Component {
     public $listAlat = ['Komputer/PC', 'Printer/Scanner', 'Jaringan/Internet', 'Aplikasi/SIMRS', 'Lain-lain'];
     public $priority = 'Medium';
     public $catatan_batal = '';
+    public $isEditMode = false;
+    public $editRooms = [];
+    public $editUnit = '';
+    public $editLocation = '';
+    public $dateStart = '';
+    public $dateEnd = '';
 
     public function with(): array
     {
@@ -61,17 +70,54 @@ new class extends Component {
             $query->where('status', $this->statusFilter);
         }
 
+        if ($this->dateStart) {
+            $query->whereDate('created_at', '>=', $this->dateStart);
+        }
+
+        if ($this->dateEnd) {
+            $query->whereDate('created_at', '<=', $this->dateEnd);
+        }
+
         $rooms = ($this->unitFilter && isset($allRooms[$this->unitFilter]))
             ? $allRooms[$this->unitFilter]
             : [];
 
         return [
-            'all_tickets' => $query->latest()->get(),
+            // Ubah ->get() menjadi ->paginate(10)
+            'all_tickets' => $query->latest()->paginate(10),
             'it_staffs'   => User::where('is_it_staff', true)->get(),
-            // PERBAIKAN: Ubah 'categories' menjadi 'units' agar sesuai dengan @foreach di HTML
             'units'       => array_keys($allRooms),
             'rooms'       => $rooms,
         ];
+    }
+    public function updatingDateStart()
+    {
+        $this->resetPage();
+    }
+    public function updatingDateEnd()
+    {
+        $this->resetPage();
+    }
+    // Fungsi otomatis berjalan saat variabel $search atau filter diubah
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+    public function updatingStatusFilter()
+    {
+        $this->resetPage();
+    }
+    public function updatingUnitFilter()
+    {
+        $this->resetPage();
+    }
+    public function updatingLocationFilter()
+    {
+        $this->resetPage();
+    }
+    public function updatingStaffFilter()
+    {
+        $this->resetPage();
     }
 
     public function confirmTakeTicket()
@@ -97,9 +143,47 @@ new class extends Component {
         $this->modal('take-ticket-modal')->show();
     }
 
-    public function updatedUnitFilter()
+    public function openEditModal($id)
     {
+        $this->isEditMode = true;
+        $this->selectedTicketId = $id;
+
+        $ticket = Ticket::find($id);
+        if (!$ticket) return;
+
+        // Ambil isi lama ke dalam state form modal
+        $this->tindak_lanjut = $ticket->tindak_lanjut;
+        $this->keterangan_it = $ticket->keterangan_it;
+        $this->kategori_perubahan = $ticket->kategori_perubahan;
+        $this->kategori_alat = $ticket->kategori_alat;
+        $this->editLocation = $ticket->location; // Gunakan variabel khusus edit
+
+        // Deteksi unit asal berdasarkan ruangan lama agar select option ruangan muncul
+        $allRooms = config('options.rooms') ?? [];
+        foreach ($allRooms as $unitName => $roomsArray) {
+            if (in_array($ticket->location, $roomsArray)) {
+                $this->editUnit = $unitName; // Gunakan variabel khusus edit
+                $this->editRooms = $roomsArray;
+                break;
+            }
+        }
+
+        $this->modal('closing-modal')->show();
+    }
+
+    // Listener otomatis ketika Unit diubah di dalam mode edit laporan
+    public function updatedUnitFilter($value)
+    {
+        $allRooms = config('options.rooms') ?? [];
+        $this->editRooms = $allRooms[$value] ?? [];
         $this->reset('locationFilter');
+    }
+
+    public function updatedEditUnit($value)
+    {
+        $allRooms = config('options.rooms') ?? [];
+        $this->editRooms = $allRooms[$value] ?? [];
+        $this->editLocation = '';
     }
 
     public function updateStatus($id, $status)
@@ -118,6 +202,13 @@ new class extends Component {
 
     public function openClosingModal($id)
     {
+        $ticket = Ticket::find($id);
+        if (!$ticket || (int) $ticket->technician_id != Auth::id()) {
+            session()->flash('monitor_msg', 'Anda tidak berhak menyelesaikan tiket ini.');
+            return;
+        }
+
+        $this->isEditMode = false;
         $this->selectedTicketId = $id;
         $this->reset(['tindak_lanjut', 'keterangan_it', 'kategori_perubahan', 'kategori_alat']);
         $this->modal('closing-modal')->show();
@@ -138,44 +229,67 @@ new class extends Component {
             'location' => $this->locationFilter,
             'staff'    => $this->staffFilter,
             'status'   => $this->statusFilter,
+            'date_start' => $this->dateStart,
+            'date_end'   => $this->dateEnd,
         ];
 
-        // Generate URL-nya
         $url = route('tickets.export-pdf', $params);
-
-        // Kirim perintah ke browser untuk membuka di tab baru
         $this->js("window.open('{$url}', '_blank')");
     }
 
     public function saveClosing()
     {
-        $this->validate([
+        $rules = [
             'kategori_alat' => 'required',
             'kategori_perubahan' => 'required',
             'tindak_lanjut' => 'required|min:10',
-        ], [
+        ];
 
+        if ($this->isEditMode) {
+            $rules['editLocation'] = 'required'; // Validasi variabel baru
+        }
+
+        $this->validate($rules, [
             'kategori_alat.required' => 'Pilih alat yang diperbaiki.',
             'kategori_perubahan.required' => 'Pilih kategori perubahan.',
             'tindak_lanjut.required' => 'Tindak lanjut wajib diisi agar terdokumentasi.',
+            'editLocation.required' => 'Ruangan penyesuaian wajib dipilih.',
         ]);
 
         $ticket = Ticket::find($this->selectedTicketId);
 
-        $ticket->update([
-            'status' => 'Closed',
-            'tindak_lanjut' => $this->tindak_lanjut,
-            'keterangan_it' => $this->keterangan_it,
-            'kategori_perubahan' => $this->kategori_perubahan,
-            'kategori_alat' => $this->kategori_alat,
-            'closed_at' => now(),
-        ]);
+        if ($this->isEditMode) {
+            $ticket->update([
+                'tindak_lanjut' => $this->tindak_lanjut,
+                'keterangan_it' => $this->keterangan_it,
+                'kategori_perubahan' => $this->kategori_perubahan,
+                'kategori_alat' => $this->kategori_alat,
+                'location' => $this->editLocation, // Update lokasi berdasarkan input modal khusus
+            ]);
+            session()->flash('monitor_msg', 'Laporan tiket #' . $this->selectedTicketId . ' berhasil diperbarui.');
+        } else {
+            if (!$ticket || (int) $ticket->technician_id != Auth::id()) {
+                $this->modal('closing-modal')->close();
+                session()->flash('monitor_msg', 'Gagal memproses. Anda bukan teknisi yang ditugaskan.');
+                return;
+            }
 
-        // Tutup modal setelah berhasil
+            $ticket->update([
+                'status' => 'Closed',
+                'tindak_lanjut' => $this->tindak_lanjut,
+                'keterangan_it' => $this->keterangan_it,
+                'kategori_perubahan' => $this->kategori_perubahan,
+                'kategori_alat' => $this->kategori_alat,
+                'closed_at' => now(),
+            ]);
+            session()->flash('message', 'Tiket berhasil diselesaikan dan ditutup.');
+        }
+
+        $this->isEditMode = false;
+        $this->reset(['editUnit', 'editLocation', 'editRooms']); // Reset setelah selesai
         $this->modal('closing-modal')->close();
-
-        session()->flash('message', 'Tiket berhasil diselesaikan dan ditutup.');
     }
+
     public function openCancelModal($id)
     {
         $this->selectedTicketId = $id;
@@ -261,7 +375,6 @@ new class extends Component {
                     </flux:select>
                 </div>
 
-                {{-- Filter Teknisi (Tetap sama) --}}
                 <div class="w-full md:w-48">
                     <flux:select wire:model.live="staffFilter" icon="user" class="bg-slate-50/50">
                         <flux:select.option value="">Semua Teknisi</flux:select.option>
@@ -271,6 +384,52 @@ new class extends Component {
                         @endforeach
                     </flux:select>
                 </div>
+
+                <div class="w-full md:w-64" wire:ignore>
+                    <div x-data="{
+        picker: null,
+        init() {
+            this.picker = flatpickr($refs.datepicker, {
+                mode: 'range',
+                dateFormat: 'Y-m-d',
+                // Sinkronisasi nilai awal jika Livewire sudah memiliki data tanggal
+                defaultDate: @json($dateStart && $dateEnd ? [$dateStart, $dateEnd] : []),
+                onChange: (selectedDates) => {
+                    // Hanya kirim data ke Livewire jika user sudah memilih kedua tanggal (start & end)
+                    if (selectedDates.length === 2) {
+                        let start = selectedDates[0].toLocaleDateString('sv-SE'); // Format YYYY-MM-DD
+                        let end = selectedDates[1].toLocaleDateString('sv-SE');
+                        
+                        @this.set('dateStart', start);
+                        @this.set('dateEnd', end);
+                    }
+                }
+            });
+
+            // Pantau jika ada reset dari Livewire, kosongkan tampilan flatpickr
+            $watch('$wire.dateStart', value => {
+                if (!value) this.picker.clear();
+            });
+        }
+    }">
+                        <flux:input
+                            x-ref="datepicker"
+                            type="text"
+                            placeholder="Pilih rentang tanggal..."
+                            icon="calendar"
+                            class="bg-slate-50/50" />
+                    </div>
+                </div>
+
+                @if($dateStart || $dateEnd)
+                <div class="flex items-center">
+                    <button
+                        wire:click="$set('dateStart', ''); $set('dateEnd', '');"
+                        class="text-xs text-red-500 hover:text-red-700 font-semibold flex items-center gap-1 bg-red-50 dark:bg-red-950/30 px-2.5 py-1.5 rounded-lg border border-red-200 dark:border-red-900 transition">
+                        Reset Tgl
+                    </button>
+                </div>
+                @endif
             </div>
 
             <flux:button wire:click="exportPdf" icon="printer" variant="outline" class="font-bold text-xs uppercase tracking-tight shadow-sm border-slate-200">
@@ -282,6 +441,7 @@ new class extends Component {
             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead class="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50 dark:bg-zinc-800/50 border-b dark:border-neutral-800">
                     <tr>
+                        <th class="px-6 py-4">Tgl Masuk</th>
                         <th class="px-6 py-4">Info Tiket</th>
                         <th class="px-6 py-4">Pelapor & Lokasi</th>
                         <th class="px-6 py-4">Kategori & Prioritas</th>
@@ -293,10 +453,18 @@ new class extends Component {
                 <tbody class="divide-y divide-gray-200 dark:divide-neutral-800">
                     @forelse($all_tickets as $ticket)
                     <tr class="bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                {{ $ticket->created_at->translatedFormat('d M Y') }}
+                            </div>
+                            <div class="text-[11px] text-gray-400 dark:text-gray-500"> {{ $ticket->created_at->translatedFormat('H:i') }}
+                            </div>
+                        </td>
                         <td class="px-6 py-4">
                             <div class="font-bold text-gray-900 dark:text-white">#{{ $ticket->id }} - {{ $ticket->subject }}</div>
                             <div class="text-xs text-gray-400 dark:text-gray-500">{{ $ticket->created_at->diffForHumans() }}</div>
                         </td>
+
                         <td class="px-6 py-4">
                             <div class="text-gray-900 dark:text-gray-200 font-medium">{{ $ticket->user->name }}</div>
                             <div class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold uppercase tracking-wider">{{ $ticket->location }}</div>
@@ -350,13 +518,34 @@ new class extends Component {
                                 </div>
                                 @endif
                                 @elseif($ticket->status == 'On Progress')
+                                @if( (int) $ticket->technician_id === auth()->id())
                                 <flux:button wire:click="openClosingModal({{ $ticket->id }})" variant="primary" size="sm" class="bg-green-600 hover:bg-green-700 border-none">
                                     Selesaikan
                                 </flux:button>
+                                @else
+                                <span class="text-xs text-gray-400 italic">Dikerjakan teknisi lain</span>
+                                @endif
                                 @elseif($ticket->status == 'Closed')
-                                <flux:button wire:click="showDetail({{ $ticket->id }})" variant="ghost" size="sm">
-                                    Lihat Detail
-                                </flux:button>
+                                <div class="flex items-center justify-center gap-1">
+                                    {{-- Tombol Lihat Detail (Ubah ke Ikon) --}}
+                                    <flux:button
+                                        wire:click="showDetail({{ $ticket->id }})"
+                                        variant="ghost"
+                                        size="sm"
+                                        icon="eye"
+                                        inset="top bottom"
+                                        v-flux:tooltip="'Lihat Detail'" />
+
+                                    {{-- Tombol Edit Laporan Backdate (Ubah ke Ikon) --}}
+                                    <flux:button
+                                        wire:click="openEditModal({{ $ticket->id }})"
+                                        variant="ghost"
+                                        size="sm"
+                                        icon="pencil-square"
+                                        inset="top bottom"
+                                        class="text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/30"
+                                        v-flux:tooltip="'Edit Laporan'" />
+                                </div>
                                 @endif
                             </div>
                         </td>
@@ -371,8 +560,22 @@ new class extends Component {
                 </tbody>
             </table>
         </div>
-        <x-tickets.closing-modal :list-alat="$listAlat" :list-perubahan="$listPerubahan" />
-        <x-tickets.detail-modal :detail-ticket="$detailTicket" />
-        <x-take-ticket-modal />
-        <x-tickets.cancel-modal />
-    </div>
+        {{-- Navigasi Pagination Link --}}
+        <div class="mt-4 px-2">
+            {{ $all_tickets->links() }}
+        </div>
+    </div> {{-- Penutup tag .overflow-x-auto milik tabel --}}
+
+
+    <x-tickets.closing-modal
+        :list-alat="$listAlat"
+        :list-perubahan="$listPerubahan"
+        :is-edit-mode="$isEditMode"
+        :edit-rooms="$editRooms"
+        :edit-unit="$editUnit"
+        :edit-location="$editLocation"
+        :unit-filter="$unitFilter" />
+    <x-tickets.detail-modal :detail-ticket="$detailTicket" />
+    <x-take-ticket-modal />
+    <x-tickets.cancel-modal />
+</div>

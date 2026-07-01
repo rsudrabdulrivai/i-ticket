@@ -8,12 +8,12 @@
 
             <div class="relative flex flex-col sm:flex-row items-center gap-6 z-10 text-center sm:text-left">
                 <div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white p-3 backdrop-blur-md border border-zinc-700 shadow-2xl">
-                    <img src="{{ asset('logo.png') }}" alt="iTicket Logo" class="h-full w-full object-contain brightness-110">
+                    <img src="{{ asset('logo.png') }}" alt="i-Ticket Logo" class="h-full w-full object-contain brightness-110">
                 </div>
 
                 <div>
                     <h1 class="text-2xl sm:text-3xl font-black tracking-tight flex items-center justify-center sm:justify-start gap-2 text-zinc-50">
-                        iTicket Dashboard
+                        i-Ticket Dashboard
                     </h1>
                     <p class="mt-2 text-zinc-400 max-w-xl text-sm sm:text-base font-medium leading-relaxed">
                         Sistem Informasi Pelaporan Kendala IT. Laporkan masalah Anda dengan mudah, dan tim IT kami akan segera meluncur untuk menanganinya!

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('subject');
             $table->text('description');
             $table->string('location')->nullable();
-            $table->enum('category', ['Hardware', 'Software', 'Network', 'Sistem RS'])->default('Hardware');
+            $table->enum('category', ['Hardware', 'Software', 'Network', 'Sistem RS', 'Pemeliharaan'])->default('Hardware');
             $table->enum('priority', ['Low', 'Medium', 'High', 'Cito'])->default('Medium');
             $table->enum('status', ['Open', 'On Progress', 'Closed', 'Cancelled'])->default('Open');
             $table->text('solution')->nullable();

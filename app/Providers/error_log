@@ -1,0 +1,24 @@
+[25-May-2026 05:21:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\ServiceProvider" not found in /home/iticketm/public_html/i-ticket/app/Providers/AppServiceProvider.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/app/Providers/AppServiceProvider.php on line 15
+[25-May-2026 05:21:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\ServiceProvider" not found in /home/iticketm/public_html/i-ticket/app/Providers/AppServiceProvider.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/app/Providers/AppServiceProvider.php on line 15
+[25-May-2026 05:21:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\ServiceProvider" not found in /home/iticketm/public_html/i-ticket/app/Providers/FortifyServiceProvider.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/app/Providers/FortifyServiceProvider.php on line 14
+[25-May-2026 05:21:24 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\ServiceProvider" not found in /home/iticketm/public_html/i-ticket/app/Providers/FortifyServiceProvider.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/app/Providers/FortifyServiceProvider.php on line 14
+[25-May-2026 05:21:24 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\ServiceProvider" not found in /home/iticketm/public_html/i-ticket/app/Providers/VoltServiceProvider.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/app/Providers/VoltServiceProvider.php on line 8
+[25-May-2026 05:21:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\ServiceProvider" not found in /home/iticketm/public_html/i-ticket/app/Providers/VoltServiceProvider.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/iticketm/public_html/i-ticket/app/Providers/VoltServiceProvider.php on line 8

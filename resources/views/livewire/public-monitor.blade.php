@@ -16,6 +16,7 @@ class extends Component {
     {
         $this->resetPage();
     }
+    
     public function updatedStatusFilter()
     {
         $this->resetPage();
@@ -23,7 +24,14 @@ class extends Component {
 
     public function with(): array
     {
-        $query = Ticket::with(['user', 'technician']);
+        // 1. Ambil bulan dan tahun saat ini
+        $currentMonth = now()->month;
+        $currentYear = now()->year;
+
+        // 2. Terapkan filter ke query utama untuk tabel
+        $query = Ticket::with(['user', 'technician'])
+            ->whereMonth('created_at', $currentMonth)
+            ->whereYear('created_at', $currentYear);
 
         $search = trim($this->search);
         $query->when($search, function ($q) use ($search) {
@@ -39,13 +47,19 @@ class extends Component {
             $q->where('status', $this->statusFilter);
         });
 
+        // 3. Buat base query untuk statistik agar kodenya tidak berulang dan rapi (DRY)
+        $statsQuery = Ticket::whereMonth('created_at', $currentMonth)
+                            ->whereYear('created_at', $currentYear);
+
         return [
-            'tickets' => $query->latest()->paginate(10),
+            'tickets' => $query->latest()->paginate(5),
+
             'stats' => [
-                'total' => Ticket::count(),
-                'open' => Ticket::where('status', 'Open')->count(),
-                'process' => Ticket::where('status', 'On Progress')->count(),
-                'closed' => Ticket::where('status', 'Closed')->count(),
+                // Menggunakan (clone) agar $statsQuery tidak termodifikasi oleh query selanjutnya
+                'total' => (clone $statsQuery)->count(),
+                'open' => (clone $statsQuery)->where('status', 'Open')->count(),
+                'process' => (clone $statsQuery)->where('status', 'On Progress')->count(),
+                'closed' => (clone $statsQuery)->where('status', 'Closed')->count(),
             ]
         ];
     }
@@ -122,8 +136,9 @@ class extends Component {
                         <tr class="hover:bg-slate-700/20 transition-colors group">
                             <td class="p-5">
                                 <div class="flex items-center gap-4">
+                                    {{-- KODE BARU (Lanjut otomatis ke halaman berikutnya) --}}
                                     <div class="hidden md:flex size-10 rounded-2xl bg-slate-700 items-center justify-center font-bold text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                                        {{ $loop->iteration }}
+                                        {{ $tickets->firstItem() + $loop->index }}
                                     </div>
                                     <div>
                                         <h4 class="font-bold text-white text-lg leading-tight">{{ $ticket->subject }}</h4>
@@ -169,8 +184,9 @@ class extends Component {
                         @endforelse
                     </tbody>
                 </table>
-                <div class="p-4 border-t border-slate-700">
-                    {{ $tickets->links() }}
+                {{-- KODE BARU (Dijamin menyatu sempurna dengan tema gelap) --}}
+                <div class="p-4 border-t border-slate-700/50 bg-slate-900/20">
+                    {{ $tickets->links('partials.monitor-pagination') }}
                 </div>
             </div>
 

@@ -37,6 +37,12 @@
                 <flux:sidebar.item icon="chart-bar" :href="route('public.monitor')" :current="request()->routeIs('public.monitor')" wire:navigate>
                     {{ __('Public Monitor') }}
                 </flux:sidebar.item>
+                <flux:sidebar.item 
+                    icon="book-open" 
+                    href="{{ route('knowledge.index') }}" 
+                    :current="request()->routeIs('knowledge.index')">
+                    Bank Knowledge
+                </flux:sidebar.item>
                 @endif
                 @endauth
             </flux:sidebar.group>

@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ticket;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf; // Pastikan pakai package dompdf
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TicketExportController extends Controller
 {
@@ -12,6 +13,11 @@ class TicketExportController extends Controller
     {
         $query = Ticket::with(['user', 'technician']);
         $allRooms = config('options.rooms') ?? [];
+
+        // Inisialisasi teks filter untuk di-render di PDF sesuai pilihan di monitor
+        $selectedUnit = 'Semua Unit';
+        $selectedLocation = 'Semua Ruangan';
+        $selectedTechnicianName = 'Semua Teknisi'; // Default jika filter teknisi dikosongkan
 
         // 1. Filter Pencarian
         if ($request->filled('search')) {
@@ -26,19 +32,25 @@ class TicketExportController extends Controller
             });
         }
 
-        // 2. Filter Unit
+        // 2. Filter Unit & Labeling
         if ($request->filled('unit') && isset($allRooms[$request->unit])) {
             $query->whereIn('location', $allRooms[$request->unit]);
+            $selectedUnit = $request->unit;
         }
 
-        // 3. Filter Ruangan Spesifik
+        // 3. Filter Ruangan Spesifik & Labeling
         if ($request->filled('location')) {
             $query->where('location', $request->location);
+            $selectedLocation = $request->location;
         }
 
-        // 4. Filter Teknisi
+        // 4. KEMBALI KE ASLI: Filter Teknisi Murni Berdasarkan Pilihan Filter di Monitor
         if ($request->filled('staff')) {
             $query->where('technician_id', $request->staff);
+            $technician = User::find($request->staff);
+            if ($technician) {
+                $selectedTechnicianName = $technician->name; // Nama teknisi sesuai yang dipilih di filter
+            }
         }
 
         // 5. Filter Status
@@ -46,16 +58,30 @@ class TicketExportController extends Controller
             $query->where('status', $request->status);
         }
 
-        // Ambil data yang sudah terfilter
-        $tickets = $query->latest()->get();
+        // 6. Filter Rentang Tanggal
+        if ($request->filled('date_start') && $request->filled('date_end')) {
+            $query->whereBetween('created_at', [
+                $request->date_start . ' 00:00:00', 
+                $request->date_end . ' 23:59:59'
+            ]);
+        }
 
-        // Generate PDF
+        // Ambil data terfilter
+        $tickets = $query->oldest()->get();
+
+        // Generate PDF dengan membawa semua informasi filter lengkap
         $pdf = Pdf::loadView('exports.tickets', [
-            'tickets' => $tickets,
-            'filters' => $request->all()
-        ])->setPaper('a4', 'landscape');
+            'tickets'                => $tickets,
+            'dateStart'              => $request->date_start,
+            'dateEnd'                => $request->date_end,
+            'selectedUnit'           => $selectedUnit,
+            'selectedLocation'       => $selectedLocation,
+            'selectedTechnicianName' => $selectedTechnicianName,
+        ])->setPaper('a4', 'portrait');
 
-        // Menggunakan stream() agar bisa di-preview di browser, ganti ke download() jika ingin langsung unduh
-        return $pdf->stream('Laporan_Tiket_IT.pdf');
+        // Nama file unduhan dibuat berdasarkan filter teknisi yang dipilih
+        $filename = 'Laporan_Tiket_IT_' . str_replace(' ', '_', $selectedTechnicianName) . '.pdf';
+
+        return $pdf->stream($filename);
     }
 }
