@@ -14,7 +14,10 @@ return [
             'PKRS',
             'TI',
             'Ruang Server',
+<<<<<<< HEAD
             'Penunjang',
+=======
+>>>>>>> 5c372590fe0c2debcdfef2db7048eb464f64054f
             'Lorong Manajemen',
             'Keperawatan',
             'Komite Medik',
@@ -39,7 +42,10 @@ return [
             'Dalam',
             'Saraf',
             'Loket Rawat Jalan',
+<<<<<<< HEAD
             'Loket Rawat Inap',
+=======
+>>>>>>> 5c372590fe0c2debcdfef2db7048eb464f64054f
             'Ruang Tunggu Rawat Jalan',
             'Loket Informasi dan Pengaduan',
             'Bedah Tulang',
@@ -102,7 +108,11 @@ return [
         'Software'  => 'Software',
         'Network'   => 'Network',
         'Sistem RS' => 'Sistem RS',
+<<<<<<< HEAD
         'Pemeliharaan' => 'Pemeliharaan',
         'Pengelolaan TI' => 'Pengelolaan TI'
+=======
+        'Pemeliharaan' => 'Pemeliharaan'
+>>>>>>> 5c372590fe0c2debcdfef2db7048eb464f64054f
     ],
 ];

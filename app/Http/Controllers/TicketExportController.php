@@ -14,10 +14,17 @@ class TicketExportController extends Controller
         $query = Ticket::with(['user', 'technician']);
         $allRooms = config('options.rooms') ?? [];
 
+<<<<<<< HEAD
         // Inisialisasi teks filter untuk di-render di PDF sesuai pilihan di monitor
         $selectedUnit = 'Semua Unit';
         $selectedLocation = 'Semua Ruangan';
         $selectedTechnicianName = 'Semua Teknisi'; // Default jika filter teknisi dikosongkan
+=======
+        // Inisialisasi teks filter untuk di-render di PDF
+        $selectedUnit = 'Semua Unit';
+        $selectedLocation = 'Semua Ruangan';
+        $selectedTechnicianName = 'Semua Teknisi';
+>>>>>>> 5c372590fe0c2debcdfef2db7048eb464f64054f
 
         // 1. Filter Pencarian
         if ($request->filled('search')) {
@@ -35,21 +42,36 @@ class TicketExportController extends Controller
         // 2. Filter Unit & Labeling
         if ($request->filled('unit') && isset($allRooms[$request->unit])) {
             $query->whereIn('location', $allRooms[$request->unit]);
+<<<<<<< HEAD
             $selectedUnit = $request->unit;
+=======
+            $selectedUnit = $request->unit; // Mengambil nama unit (ex: IGD, Rawat Jalan, dll)
+>>>>>>> 5c372590fe0c2debcdfef2db7048eb464f64054f
         }
 
         // 3. Filter Ruangan Spesifik & Labeling
         if ($request->filled('location')) {
             $query->where('location', $request->location);
+<<<<<<< HEAD
             $selectedLocation = $request->location;
         }
 
         // 4. KEMBALI KE ASLI: Filter Teknisi Murni Berdasarkan Pilihan Filter di Monitor
+=======
+            $selectedLocation = $request->location; // Nama ruangan spesifik
+        }
+
+        // 4. Filter Teknisi & Labeling
+>>>>>>> 5c372590fe0c2debcdfef2db7048eb464f64054f
         if ($request->filled('staff')) {
             $query->where('technician_id', $request->staff);
             $technician = User::find($request->staff);
             if ($technician) {
+<<<<<<< HEAD
                 $selectedTechnicianName = $technician->name; // Nama teknisi sesuai yang dipilih di filter
+=======
+                $selectedTechnicianName = $technician->name;
+>>>>>>> 5c372590fe0c2debcdfef2db7048eb464f64054f
             }
         }
 
@@ -79,9 +101,13 @@ class TicketExportController extends Controller
             'selectedTechnicianName' => $selectedTechnicianName,
         ])->setPaper('a4', 'portrait');
 
+<<<<<<< HEAD
         // Nama file unduhan dibuat berdasarkan filter teknisi yang dipilih
         $filename = 'Laporan_Tiket_IT_' . str_replace(' ', '_', $selectedTechnicianName) . '.pdf';
 
         return $pdf->stream($filename);
+=======
+        return $pdf->stream('Laporan_Tiket_IT.pdf');
+>>>>>>> 5c372590fe0c2debcdfef2db7048eb464f64054f
     }
 }

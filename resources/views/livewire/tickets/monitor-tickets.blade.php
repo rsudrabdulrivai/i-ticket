@@ -203,7 +203,11 @@ new class extends Component {
     public function openClosingModal($id)
     {
         $ticket = Ticket::find($id);
+<<<<<<< HEAD
         if (!$ticket || (int) $ticket->technician_id != Auth::id()) {
+=======
+        if (!$ticket || (int)$ticket->technician_id != Auth::id()) {
+>>>>>>> 5c372590fe0c2debcdfef2db7048eb464f64054f
             session()->flash('monitor_msg', 'Anda tidak berhak menyelesaikan tiket ini.');
             return;
         }
@@ -268,7 +272,11 @@ new class extends Component {
             ]);
             session()->flash('monitor_msg', 'Laporan tiket #' . $this->selectedTicketId . ' berhasil diperbarui.');
         } else {
+<<<<<<< HEAD
             if (!$ticket || (int) $ticket->technician_id != Auth::id()) {
+=======
+            if (!$ticket || (int)$ticket->technician_id != Auth::id()) {
+>>>>>>> 5c372590fe0c2debcdfef2db7048eb464f64054f
                 $this->modal('closing-modal')->close();
                 session()->flash('monitor_msg', 'Gagal memproses. Anda bukan teknisi yang ditugaskan.');
                 return;
@@ -518,7 +526,11 @@ new class extends Component {
                                 </div>
                                 @endif
                                 @elseif($ticket->status == 'On Progress')
+<<<<<<< HEAD
                                 @if( (int) $ticket->technician_id === auth()->id())
+=======
+                                @if($ticket->technician_id === auth()->id())
+>>>>>>> 5c372590fe0c2debcdfef2db7048eb464f64054f
                                 <flux:button wire:click="openClosingModal({{ $ticket->id }})" variant="primary" size="sm" class="bg-green-600 hover:bg-green-700 border-none">
                                     Selesaikan
                                 </flux:button>
