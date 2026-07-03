@@ -172,7 +172,6 @@ new class extends Component {
         @endfor
     </div>
 
-    {{-- Grid Daftar Artikel Utama --}}
     <div wire:loading.remove wire:target="search, unitFilter, categoryFilter" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         @forelse($articles as $article)
             @php
@@ -214,15 +213,16 @@ new class extends Component {
             {{-- CARD DENGAN STYLE GRAFIS BARU --}}
             <div class="relative bg-white dark:bg-zinc-900 bg-gradient-to-br {{ $bgGradient }} p-5 rounded-2xl border border-gray-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300 group cursor-pointer {{ $borderColor }} overflow-hidden">
                 
-                {{-- Grafis Latar Belakang --}}
-                <div class="absolute -right-6 -top-6 pointer-events-none transition-transform duration-500 group-hover:scale-110 {{ $iconColor }}">
-                    <flux:icon name="{{ $bgIcon }}" class="size-28" variant="outline" stroke-width="1" />
+                {{-- PERBAIKAN: Posisi dipindah ke bottom-right dan z-0 --}}
+                <div class="absolute -right-4 -bottom-4 z-0 pointer-events-none transition-transform duration-500 group-hover:scale-110 {{ $iconColor }}">
+                    <flux:icon name="{{ $bgIcon }}" class="size-32" variant="outline" stroke-width="1" />
                 </div>
 
-                {{-- Trik Utama Link Pembungkus Clickable --}}
-                <a href="{{ route('knowledge.show', $article->slug) }}" class="absolute inset-0 z-10"></a>
+                {{-- Trik Utama Link Pembungkus Clickable (z-20 agar jadi yang teratas) --}}
+                <a href="{{ route('knowledge.show', $article->slug) }}" class="absolute inset-0 z-20"></a>
 
-                <div class="space-y-3 relative z-0">
+                {{-- PERBAIKAN: Z-index diubah jadi 10 agar teks berada di atas ikon grafis --}}
+                <div class="space-y-3 relative z-10">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-1.5">
                             <span class="text-[10px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded border {{ $badgeColor }}">
@@ -242,12 +242,12 @@ new class extends Component {
                         {{ $article->title }}
                     </h3>
                     
-                    <p class="text-xs text-gray-500 dark:text-gray-400 block [@supports(-webkit-line-clamp:3)]:line-clamp-3 break-all overflow-hidden whitespace-normal leading-relaxed">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 block [@supports(-webkit-line-clamp:3)]:line-clamp-3 break-all overflow-hidden whitespace-normal leading-relaxed relative">
                         {{ strip_tags($article->content) }}
                     </p>
                 </div>
 
-                <div class="pt-4 mt-4 border-t border-gray-100 dark:border-neutral-800/60 flex justify-between items-center text-[11px] text-gray-400 relative z-0">
+                <div class="pt-4 mt-4 border-t border-gray-100 dark:border-neutral-800/60 flex justify-between items-center text-[11px] text-gray-400 relative z-10">
                     <span class="flex items-center gap-1">
                         <flux:icon name="user" class="size-3" /> Oleh: <strong class="text-gray-600 dark:text-gray-300 font-semibold">{{ $article->user->name }}</strong>
                     </span>
